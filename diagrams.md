@@ -4,7 +4,7 @@ Back to the plan: [README.md](README.md)
 
 **Why B and C:** these are where a message actually leaves a number and where replies come back. Most failures happen here, and so does the live-chat behaviour. A (setting up lines) is done by our admins by hand in v1. D (line health) is covered by the automatic rules in the plan, section 3.
 
-**How to read:** a circle is the start or an end. A diamond is a question with yes and no arrows. A box is an action, and the bold text says **who** does it. Green boxes mark the moment a message actually leaves a number, and which number.
+**How to read:** a circle is the start or an end. A diamond is a question with yes and no arrows. A box is an action, and the bold text says **who** does it: our app, the queue, the AI, the provider, or the lead's phone. Green boxes mark the moment a message actually leaves a number, and which number.
 
 ---
 
@@ -15,9 +15,9 @@ flowchart TD
     S(("Campaign step<br/>is due")) --> A1["<b>Scheduler → Queue</b><br/>picks up the step job"]
     A1 --> Q0{"Already sent?<br/>same message id"}
     Q0 -- yes --> E0((End))
-    Q0 -- no --> Q1{"iMessage on for this campaign<br/>and customer has a live line?"}
+    Q0 -- no --> Q1{"iMessage switched on<br/>globally, for the customer and<br/>the campaign, and a live line?"}
     Q1 -- no --> F1["<b>Our app</b><br/>uses the campaign's next channel"] --> E1((End))
-    Q1 -- yes --> Q2{"US/CA number, has consent,<br/>not opted out?"}
+    Q1 -- yes --> Q2{"US/CA number, has consent,<br/>not opted out, not already<br/>in an SMS chat?"}
     Q2 -- no --> F2["<b>Our app</b><br/>uses next channel, logs why"] --> E2((End))
     Q2 -- yes --> Q3{"iMessage result cached<br/>in last 30 days?"}
     Q3 -- no --> L1["<b>Provider</b><br/>lookup: is this number on iMessage?"] --> L2["<b>Our app</b><br/>saves the result"] --> Q4
@@ -36,17 +36,25 @@ flowchart TD
     Q9 -- no --> R2["<b>Queue</b><br/>tries again in 10 min"] --> E7((End))
 
     Q10{"Has the lead ever<br/>replied on line X?"}
-    Q10 -- yes --> AI2["<b>AI</b><br/>writes the full message,<br/>checkout link allowed"] --> Q12
+    Q10 -- yes --> AI2["<b>AI</b><br/>writes the full message,<br/>checkout link allowed"] --> QC
     Q10 -- no --> Q11{"Already 2 iMessages<br/>with no reply?"}
     Q11 -- yes --> F6["<b>Our app</b><br/>moves the lead to SMS,<br/>sends with the link"] --> E8((End))
-    Q11 -- no --> AI1["<b>AI</b><br/>writes a short question:<br/>no link, max 300 characters"] --> Q12
+    Q11 -- no --> AI1["<b>AI</b><br/>writes a short question:<br/>no link, max 300 characters"] --> QC
+
+    QC{"Passes our<br/>content check?"}
+    QC -- no --> QC2{"Already<br/>rewritten once?"}
+    QC2 -- no --> AI4["<b>AI</b><br/>rewrites the message"] --> QC
+    QC2 -- yes --> F10["<b>Our app</b><br/>does not send, logs,<br/>alerts the team"] --> E13((End))
+    QC -- yes --> Q12
 
     Q12{"Free sending slot<br/>on line X right now?"}
     Q12 -- no --> R3["<b>Queue</b><br/>waits a few seconds"] --> Q12
     Q12 -- yes --> SEND["<b>Our app → Provider API</b><br/>send from line X"]
     SEND --> Q13{"Provider<br/>accepted it?"}
-    Q13 -- yes --> OUT["<b>Provider</b><br/>MESSAGE LEAVES LINE X<br/>to the lead's iPhone"]:::out
-    OUT --> OK2["<b>Our app</b><br/>saves provider id,<br/>pins the lead to line X"] --> E9(("End<br/>status comes<br/>by webhook"))
+    Q13 -- yes --> OK2["<b>Our app</b><br/>saves provider id,<br/>pins the lead to line X"]
+    OK2 --> OUT["<b>Provider</b><br/>MESSAGE LEAVES LINE X"]:::out
+    OUT --> PH["<b>Lead's phone</b><br/>blue bubble arrives<br/>from line X"]
+    PH --> E9(("End<br/>delivery status<br/>comes by webhook, C"))
     Q13 -- no --> Q14{"Temporary error?<br/>rate limit, 5xx, timeout"}
     Q14 -- yes --> Q15{"Tried 3<br/>times already?"}
     Q15 -- no --> R4["<b>Queue</b><br/>retries with a growing delay"] --> Q12
@@ -60,13 +68,16 @@ flowchart TD
     classDef out fill:#d8f5d0,stroke:#2e7d32,stroke-width:2px,color:#000
 ```
 
+If the diagram doesn't render: [diagram-b.png](diagram-b.png)
+
 ---
 
 ## C. Provider webhooks: statuses and a lead's reply, up to the AI's answer going out
 
 ```mermaid
 flowchart TD
-    S(("Provider sends<br/>a webhook")) --> Q1{"Signature<br/>valid?"}
+    S(("Lead's phone<br/>replies, or a delivery<br/>receipt comes back")) --> P1["<b>Provider</b><br/>receives it on line X,<br/>sends a webhook to our app"]
+    P1 --> Q1{"Signature<br/>valid?"}
     Q1 -- no --> X1["<b>Our app</b><br/>rejects it, logs"] --> E1((End))
     Q1 -- yes --> Q2{"Seen this<br/>event id before?"}
     Q2 -- yes --> X2["<b>Our app</b><br/>answers OK, ignores it"] --> E2((End))
@@ -74,7 +85,9 @@ flowchart TD
     A1 --> Q3{"Is it a reply<br/>from a lead?"}
 
     %% Status branch
-    Q3 -- no --> Q4{"Status:<br/>delivered?"}
+    Q3 -- no --> Q4a{"Provider says<br/>line X is flagged?"}
+    Q4a -- yes --> D4
+    Q4a -- no --> Q4{"Status:<br/>delivered?"}
     Q4 -- yes --> D1["<b>Queue</b><br/>marks message delivered,<br/>updates line stats"] --> E3((End))
     Q4 -- no --> Q5{"Went as SMS or<br/>not on iMessage?"}
     Q5 -- yes --> D2["<b>Queue</b><br/>marks lead not on iMessage,<br/>next steps go by SMS"] --> E4((End))
@@ -95,12 +108,17 @@ flowchart TD
     Q10 -- no --> AI["<b>AI</b><br/>reads the whole chat, writes<br/>one answer, picks the next step"]
     AI --> Q11{"AI asks for<br/>a person?"}
     Q11 -- yes --> R4
-    Q11 -- no --> Q12{"Line X still<br/>healthy?"}
+    Q11 -- no --> QC{"Answer passes our<br/>content check?"}
+    QC -- no --> R4
+    QC -- yes --> Q12{"Line X still<br/>healthy?"}
     Q12 -- no --> R6["<b>Our app</b><br/>sends the answer by SMS<br/>from the customer's SMS number"] --> E10((End))
     Q12 -- yes --> R7["<b>Queue</b><br/>priority send job on line X<br/>skips sending hours: lead is active"]
     R7 --> Q13{"Provider<br/>accepted it?"}
-    Q13 -- yes --> OUT["<b>Provider</b><br/>ANSWER LEAVES LINE X,<br/>the same number the lead wrote to"]:::out --> E11((End))
+    Q13 -- yes --> OUT["<b>Provider</b><br/>ANSWER LEAVES LINE X,<br/>the same number the lead wrote to"]:::out
+    OUT --> PH["<b>Lead's phone</b><br/>answer arrives in<br/>the same thread"] --> E11((End))
     Q13 -- no --> R8["<b>Queue</b><br/>same retry and fallback rules<br/>as diagram B"] --> E12((End))
 
     classDef out fill:#d8f5d0,stroke:#2e7d32,stroke-width:2px,color:#000
 ```
+
+If the diagram doesn't render: [diagram-c.png](diagram-c.png)
