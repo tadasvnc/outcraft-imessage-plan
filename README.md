@@ -8,9 +8,9 @@ Tadas Vinckas · [Diagrams](diagrams.md) · [Appendix: details, numbers, sources
 
 ## 1. Provider: which one, and why
 
-- **Compared:** Linq, Sendblue, Blooio, Photon, our own Macs. All allow about 50 new chats a day.
+- **Today:** no iMessage provider. **Compared:** Linq, Sendblue, Blooio, Photon, our own Macs.
 - **Suggestion: Linq**, if it shows its SOC 2 Type II report.
-- **Why:** line health in its API, a 99.95% uptime contract, no competing product.
+- **Why:** limits are the same, so terms decide: a line-health API, 99.95% uptime, no rival product.
 - **Not the others:** Sendblue (2026 breach, rival product), Blooio (no SOC 2), Photon, own Macs.
 
 ## 2. Risks: what breaks at volume, and what we do
@@ -52,13 +52,13 @@ More edge cases (bursts, photos and voice, calls during a chat): [appendix D](ap
 - **Today:** every lead gets every channel in the campaign.
 - **Suggestion:** only US/CA iPhone numbers with consent, split at random against SMS.
 - **The rest**, Android included, get the next channel, as today. We log why.
+- **Why:** the split compares iPhone users with iPhone users, and nobody gets less than today.
 
 ## 6. First version and time
 
 - **Step 0, before building:** count shoppers, then one line by hand for 2–3 weeks (~$300).
 - **Step 1, in build order:** replies (diagram C), then sending (diagram B), then the 2–3 store pilot.
 - **How long:** 4 weeks of building for one engineer, 12 weeks from step 0 to the decision.
-- **Blocks us:** the provider contract, and legal's answer on consent and state rules.
+- **Blocks us:** the provider contract, legal on consent. **Could slip:** a ban in warm-up.
 - **Where we simplified:** no self-serve, Slack not a dashboard, SMS fallback, US/CA, no media.
-- **Could slip:** a ban during warm-up, slow line setup.
 - **Go:** replies at least 2× SMS, then 2 points more carts recovered.
