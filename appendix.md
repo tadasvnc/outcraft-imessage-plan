@@ -100,6 +100,7 @@ About 4 in 10 US phones in use are Android (StatCounter, mid-2026: iOS 58–61%,
 - **One company, several brands.** Lines belong to a brand, so a lead always sees one brand per number.
 - **Bursts.** People send 3 messages in a row. Typing dots, wait 15 s, then one answer.
 - **Photos and voice notes.** They go to a person. The AI can't hear a voice note.
+- **Calls during a chat.** Today AI calls run on schedule. No call while the lead is chatting on iMessage, because two channels at once looks broken.
 - **Opt-out scope.** An opt-out covers every channel of that store, not other stores on Outcraft, because consent is given per brand.
 
 ## E. Law
