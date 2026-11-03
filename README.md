@@ -55,7 +55,8 @@ Tadas Vinckas · [Diagrams](diagrams.md) · [Appendix: details, numbers, sources
 
 ## 6. First version and time
 
-- **In, in build order:** replies (diagram C), then sending (diagram B).
+- **Step 0, before building:** one store, one line, by hand for 2–3 weeks (~$300). Half the iPhone carts get iMessage, half SMS. We build only if replies are at least 2× SMS.
+- **Step 1, in build order:** replies (diagram C), then sending (diagram B), then the 2–3 store pilot.
 - **Waits:** self-serve, billing, a dashboard, media, RCS, countries beyond US/CA.
 - **How long:** 4 weeks for one engineer, 8 with the pilot. The provider contract blocks us.
 - **Could slip:** a ban during warm-up, legal answers.
