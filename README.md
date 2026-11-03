@@ -2,14 +2,15 @@
 
 Tadas Vinckas · [Diagrams](diagrams.md)
 
+- **Step 0:** count how many shoppers we can reach, then test one line by hand. Only then we build.
 - **Phase 1**, a pilot with 2–3 US stores: shoppers who tap "Prefer iMessage?" write to us first.
 - **Phase 2:** we send cart messages first, tested against SMS. Then go or no-go.
 
 ## 1. Provider: which one, and why
 
-- **Today:** none. **Compared:** Linq, Sendblue (2026 breach), Blooio (no SOC 2), Photon, own Macs.
-- **Suggestion: Linq**, if it shows its SOC 2 Type II report.
-- **Why:** limits are the same, so terms decide: a line-health API, 99.95% uptime, no rival product.
+- **Today:** none. **Compared:** Blooio, Linq, Sendblue (2026 breach), Photon, own Macs.
+- **Suggestion: Blooio**, with a data agreement, and its SOC 2 done before we scale.
+- **Why:** public prices ($195 a line at 6+), live in days, hard limits that catch our mistakes.
 
 ## 2. Risks: what breaks at volume, and what we do
 
@@ -18,8 +19,8 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 | **Apple blocks a line** | Junk reports or bursts block the number. Its chats drop. | New chats ramp 10 → 25 → 50 a day. Consent only, no nights. |
 | **No link before a reply** | iPhones disable links from strangers. | One short question first. The link after a reply, or by SMS. |
 | **Lead not on iMessage** | About 4 in 10 US phones are Android. | We look up each number first. Not on iMessage → SMS, as today. |
-| **Few replies** | A line that only sends looks like a bot to Apple. | If a line's replies halve, it starts no new chats. |
-| **One bad store** | It can get our whole provider account closed. | Admins check each store. A kill switch per store. |
+| **Few replies** | One-way lines look like bots. | Replies halve → no new chats. |
+| **One bad store** | It can get our account closed. | Admin check, a sub-account per store. |
 | **STOP and state law** | No carrier catches STOP. Some states limit hours. | We catch STOP ourselves and use the SMS law checks. |
 | **Cost** | $0.20 a lead, against $0.01 for SMS. | It pays off for us at about 15 more carts per 1,000 leads. |
 
@@ -57,7 +58,7 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 - **Step 0, before building:** count shoppers, then one line by hand for 2–3 weeks (~$300).
 - **Step 1, in build order:** replies (diagram C), then sending (diagram B), then the 2–3 store pilot.
 - **How long:** 4 weeks of building for one engineer, 12 weeks from step 0 to the decision.
-- **Blocks us:** the contract, legal on consent. **Could slip:** a ban in warm-up, line setup.
+- **Blocks us:** the data agreement, legal on consent. **Could slip:** a ban, few replies.
 - **Where we simplified:** no self-serve, Slack not a dashboard, SMS fallback, US/CA, no media.
 - **Go:** replies at least 2× SMS, then 2 points more carts recovered.
 - **Questions:** Is iMessage live? Does SMS consent cover it? Do channels share one send path?

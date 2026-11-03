@@ -15,7 +15,11 @@ Back to the plan: [README.md](README.md) · [Diagrams](diagrams.md)
 | Company | Raised about $20M (Feb 2026), 1,000+ teams, used by Lindy. Sells the API since about 2025. | The oldest, 5+ years | Founded 2024 | Small. Open-source core. |
 | Conflict with us | None found | Sells its own iMessage cart recovery to Shopify brands | None found | None found |
 
-**Pick:** Linq, if it shows its SOC 2 Type II report and puts the pre-reply rules in the contract. Sendblue second: the most detailed rules, but the breach and its competing product. Blooio for the cheap manual test, since its prices are public. Photon doesn't fit: its pricing page sells cold outreach while its own guide says not to do it.
+**Pick: Blooio**, from step 0 through the pilot, so the line warmed in step 0 carries into the pilot.
+- **Why:** public prices ($195 a line at 6+, no setup fees), live in days, and hard limits with an error code for each rule, so the provider catches our own mistakes. It falls back to SMS only through our own Twilio, so keeping our SMS path is the default.
+- **Conditions:** a data agreement (DPA) before any shopper data flows, and its SOC 2 finished before we grow beyond the pilot (its trust page says "in progress"). Otherwise we move to Linq; our provider interface keeps that to about a week.
+- **Plan B: Linq.** It claims SOC 2 Type II, has a 99.95% uptime contract and automatic failover, but no public price.
+- **Not Sendblue:** the July 2026 breach and its competing cart product. **Not Photon:** its pricing page sells cold outreach while its own guide says not to do it.
 
 **Also looked at:**
 - **Our own Mac minis:** rejected. The bans and the hardware would be ours, and one AI company (Lindy) was banned within half a day of launch on its own setup.
@@ -30,10 +34,19 @@ Back to the plan: [README.md](README.md) · [Diagrams](diagrams.md)
 - our customers' data is never used for the provider's own products or marketing;
 - whether their automatic SMS fallback can be turned off. It would skip our own SMS consent and STOP handling;
 - a sub-account and a kill switch per customer, so one brand can't get our whole account closed, and in writing that one store's ban can't affect the others;
-- with Linq, a separate pool per store. If we choose the line ourselves, Linq's automatic failover turns off;
+- with Blooio, when its SOC 2 will be done, and whether a ban in one store's sub-account slows the others (its `sibling_ban` rule slows every number on an account for 72 hours);
+- with Linq (plan B), a separate pool per store. If we choose the line ourselves, Linq's automatic failover turns off;
 - the SOC 2 report itself, the auditor's name and the breach history.
 
-**Provider details that shape the build.** From Linq's docs:
+**Provider details that shape the build.** From Blooio's docs (our pick):
+- Before a written reply, a chat allows 3 plain-text messages, and links and media are blocked (`conversation_content_restricted`). Our no-link rule and "two unanswered → SMS" stay inside that.
+- The `one_way` rule: over 10 new chats a day (3-day average) with under 40% written replies slows the line, then pauses new chats. Sizing has to allow for it (section F).
+- Its 429 errors such as `conversation_awaiting_reply` aren't temporary, and retrying won't help. Our retry logic reads the error key, not just the status code.
+- The `safety.state_changed` webhook and the health endpoint (polled every 5 minutes) feed our health job.
+- One banned number slows every number on the account for 72 hours (`sibling_ban`), so each store gets its own sub-account.
+- SMS fallback runs only through our own Twilio account. We leave it off and use our SMS path.
+
+From Linq's docs (plan B):
 - A `phone_number.status_updated` webhook reports health changes (healthy, at risk, critical), so the health job uses Linq's own signal.
 - When Linq picks the line, the recipients of a flagged line move to a fresh one (`failover_flagged`). A `continuation_message` can explain the new number.
 - A flagged Linq number also stops sending SMS, by Linq's help page. One more reason to fall back through our own SMS path.
@@ -52,7 +65,7 @@ The plan lists the main ones. The full list:
 
 | Risk | What breaks | What we do |
 |---|---|---|
-| **No link before a reply** | iOS disables links from unknown senders until the person replies. Sendblue also blocks links and media before a reply, with max 300 characters and 6 messages. Our cart message leads with the link. | The first message names the brand, says it's an assistant and asks one short question. For example: "Hi Sam, this is the Glow Shop assistant. You left the blue scarf in your cart. Want me to save it for you?" The link comes after the reply. Two unanswered messages → the next step goes by SMS with the link. |
+| **No link before a reply** | iOS disables links from unknown senders until the person replies. Blooio also blocks links and media before a written reply, and allows 3 plain-text messages until then. Our cart message leads with the link. | The first message names the brand, says it's an assistant and asks one short question. For example: "Hi Sam, this is the Glow Shop assistant. You left the blue scarf in your cart. Want me to save it for you?" The link comes after the reply. Two unanswered messages → the next step goes by SMS with the link. |
 | **Apple blocks a line** | Junk reports, bursts and night sends. Every open chat on the line dies too. | New chats per line ramp 10 → 25 → 50 a day over 3 weeks, max 15 an hour, spread out. Consent only, no night sends, a contact card after the first reply. One brand per line, never shared. |
 | **Reply rate** | Too few replies: a line that only sends looks like a bot to Apple. Many replies: more AI calls, longer chats, more handoffs. | Track replies against sends per line. When they drop, the line stops starting new chats. Phase 1 starts every line with two-way chats. A cap of 30 AI replies per chat, then a person. |
 | **One customer's content** | Adult, drug or scam content can get our *whole* provider account closed, with no refund. | Admins check what the brand sells before turning it on (list below). Every AI message passes a content check. Watch opt-outs and "who is this" replies per customer. Sub-account and kill switch per customer. |
@@ -117,6 +130,7 @@ About 4 in 10 US phones in use are Android (StatCounter, mid-2026: iOS 58–61%,
 ## F. Sizing and cost
 
 - **Lines needed per store** = eligible leads a day ÷ 40. The cap is 50, and the rest is headroom for spreading sends out and for retries.
+- **With Blooio's reply rule:** if a line's new chats get under 40% written replies, Blooio slows it to about 10 new chats a day. Then the formula is ÷ 10, and a line costs about 4× more per lead. The pilot shows which case applies; step 0 gives a first hint.
 - **Example:** a store with 300 carts a day with consent and a US/CA number. If 55–70% are on iMessage, that is 165–210 leads a day, so **5–6 lines**. In the pilot only half of them get iMessage, so about 3 lines.
 - During warm-up a line takes only 10, then 25, new chats a day. Phase 1 covers part of this period.
 - **Cost per line:** about $195–$290 a month (Blooio list price, Linq reported at about $250, Sendblue on request). At about 1,200 new chats a line a month, that is $0.15–$0.25 a lead, against about $0.01 for SMS.
@@ -157,7 +171,7 @@ Two-sided test, 5% significance, 80% power. The baselines (6% SMS reply rate, 10
 
 **Step 0: is it worth it? (weeks 1–3, about $300, no build)**
 - **Count the eligible shoppers** (a few days): carts with consent and a US/CA number, times the iPhone share from a lookup on about 500 numbers.
-- **Manual test:** one store, one line. Half the iPhone carts get iMessage, half get SMS. A person answers, with AI drafts. Dashboard sends skip our consent, Do Not Call and hours checks, so someone checks those by hand.
+- **Manual test:** one store, one Blooio line, which goes on into the pilot. Half the iPhone carts get iMessage, half get SMS. A person answers, with AI drafts. Dashboard sends skip our consent, Do Not Call and hours checks, so someone checks those by hand.
 - **At the same time:** provider contract, data agreement (DPA), legal check on state rules.
 - **Go on if:** a store has at least ~30 eligible shoppers a day, replies are at least 2× SMS, and the line isn't flagged. **Otherwise stop**, or look at RCS.
 
@@ -185,6 +199,7 @@ Two-sided test, 5% significance, 80% power. The baselines (6% SMS reply rate, 10
 - **Go if:** replies at least 2× SMS, recovery at least 2 points above SMS, opt-outs no higher than SMS, and under 1 blocked line per 10 line-months (section G).
 - **Go →** a paid add-on per line, more stores, later self-serve.
 - **No-go →** keep phase 1 only (iMessage for shoppers who ask for it), or stop and look at RCS.
+- **Before growing beyond the pilot:** Blooio's SOC 2 must be finished, or we move to Linq.
 
 **Other notes:**
 - **The step 0 line is warm by week 4**, so the pilot can use it from day one.
@@ -229,6 +244,7 @@ Two-sided test, 5% significance, 80% power. The baselines (6% SMS reply rate, 10
 7. What share of our stores' shoppers use iPhones?
 8. Have you looked at RCS for Business?
 9. How much downside is acceptable if Apple cut iMessage off overnight?
+10. Do you already use Blooio, or have you talked to them?
 
 ## Sources
 
