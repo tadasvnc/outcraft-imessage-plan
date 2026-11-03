@@ -146,19 +146,50 @@ Two-sided test, 5% significance, 80% power. The baselines (6% SMS reply rate, 10
 
 ## H. Rollout
 
-- **Week 0:** provider calls, contract, DPA, legal check on state rules. Lines ordered.
-- **Weeks 1–2:** build replies (diagram C). That is all phase 1 needs.
-- **Weeks 3–4, phase 1:** SMS and email steps offer "prefer iMessage? tap here", only to numbers confirmed on iMessage. The link opens a chat with the store's line and pre-fills a short code. The lead writes first, so:
+| Weeks | Phase | The question it answers |
+|---|---|---|
+| 1–3 | **Step 0:** is it worth it? | Are there enough eligible shoppers, and do they reply? |
+| 4–5 | **Build:** replies (diagram C) | — |
+| 6–7 | **Phase 1:** shoppers write first, while we build sending (diagram B) | Does the system work, and how many shoppers want iMessage? |
+| 8–11 | **Phase 2:** we write first, tested against SMS | Does iMessage recover more carts? |
+| 12 | **Decision** | Go or no-go |
+
+**Step 0: is it worth it? (weeks 1–3, about $300, no build)**
+- **Count the eligible shoppers** (a few days): carts with consent and a US/CA number, times the iPhone share from a lookup on about 500 numbers.
+- **Manual test:** one store, one line. Half the iPhone carts get iMessage, half get SMS. A person answers, with AI drafts. Dashboard sends skip our consent, Do Not Call and hours checks, so someone checks those by hand.
+- **At the same time:** provider contract, data agreement (DPA), legal check on state rules.
+- **Go on if:** a store has at least ~30 eligible shoppers a day, replies are at least 2× SMS, and the line isn't flagged. **Otherwise stop**, or look at RCS.
+
+**Build: replies (weeks 4–5)**
+- Provider interface, webhooks with the catch-up job, STOP handling, chat rules (typing dots, 15 s wait, a cap of 30), content check.
+- The "Prefer iMessage?" link in our own SMS and email steps.
+
+**Phase 1: shoppers write first (weeks 6–7)**
+- 2–3 US stores, switched on by our admins. We pay for the lines.
+- SMS and email steps offer "Prefer iMessage? Tap here", only to numbers confirmed on iMessage. The link opens a chat with the store's line and pre-fills a short code. The shopper writes first, so:
   - links work, and there is no junk banner;
   - none of the pre-reply rules apply;
   - Apple stops filtering a sender once the person has replied 3 times;
   - real two-way chats warm the lines up.
+- **We measure:** how many tap, how chats go, the AI cost per chat, lookup accuracy, line health.
+- **Meanwhile we build sending (diagram B):** lookup, per-line limits, no-link rules, health alerts, SMS fallback.
+- **What phase 1 can't show:** whether iMessage recovers more carts, or how people react when we write first.
 
-  Meanwhile we build sending (diagram B).
-- **Weeks 5–8, phase 2:** outbound cart messages on the warm lines, 50/50 against SMS. The riskiest part, the cold first message, starts last and on the healthiest lines.
+**Phase 2: we write first (weeks 8–11)**
+- Cart messages by iMessage on the warmed lines, so about 50 new chats per line a day from the start.
+- A random split between iMessage and SMS, among iPhone shoppers only. If lines are the bottleneck, the SMS group can be up to 3× bigger.
+- **We measure:** replies, recovered carts, opt-outs, blocked lines.
+
+**Decision (week 12)**
+- **Go if:** replies at least 2× SMS, recovery at least 2 points above SMS, opt-outs no higher than SMS, and under 1 blocked line per 10 line-months (section G).
+- **Go →** a paid add-on per line, more stores, later self-serve.
+- **No-go →** keep phase 1 only (iMessage for shoppers who ask for it), or stop and look at RCS.
+
+**Other notes:**
+- **The step 0 line is warm by week 4**, so the pilot can use it from day one.
 - **If the team wants less risk:** stop after phase 1. v1 is then replies only, and outbound comes later.
-- **Cheapest test of all:** one line and one customer, run by hand from the provider's dashboard, to measure the lift before any build. Dashboard sends skip our consent, STOP and hours checks, so someone checks those by hand. It also gives an early cart-recovery number during the build, which phase 1 can't.
-- **Effort:** about 4 weeks of build for one engineer, 3–5 depending on how channel-neutral our code is.
+- **If Outcraft already runs iMessage:** skip step 0 and use that data.
+- **Effort:** about 4 weeks of build for one engineer, 3–5 depending on how channel-neutral our code is. Lines for the pilot: $2,500–$6,000.
 
 ## I. Platform risk
 

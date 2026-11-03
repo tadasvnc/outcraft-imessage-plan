@@ -2,10 +2,10 @@
 
 Tadas Vinckas · [Diagrams](diagrams.md) · [Appendix: details, numbers, sources](appendix.md) · [Questions for the team](appendix.md#k-questions-for-the-team)
 
-- **Pilot:** 2–3 US stores for about 8 weeks, then go or no-go.
+- **Pilot:** 2–3 US stores for about 6 weeks, then go or no-go.
 - **Phase 1:** shoppers who tap "Prefer iMessage?" write to us first. This warms up the lines.
 - **Phase 2:** we send cart messages first, tested against SMS.
-- **Why it's hard:** Apple has no API for businesses to message first. Each line is a real number: about 50 new chats a day, no links before a reply, and "Report junk" taps can block it.
+- **Why it's hard:** Apple has no API for this. A line is one real number, about 50 new chats a day.
 
 ## 1. Provider: which one, and why
 
@@ -26,12 +26,15 @@ Tadas Vinckas · [Diagrams](diagrams.md) · [Appendix: details, numbers, sources
 | **STOP and state law** | Our own STOP check, the SMS law checks, no FL/MD/OK. |
 | **Cost:** $0.20 vs $0.01 a lead | Pays off for us at about 15 more carts per 1,000 leads. |
 
-| Live chat changes | Today | Suggestion | Why |
+| Live chat | Today | Suggestion | Why |
 |---|---|---|---|
-| Sending hours | Every step waits | Reply at once to an active lead, within state law | Live chat, but the law applies |
-| Reply limit | 5, then a person | 30, then a person | Going silent loses the lead |
-| Sender number | One per channel | One per lead | A new number looks like a scam |
-| Follow-ups | Run on schedule | A reply or purchase cancels them | No reminder after "yes, buying" |
+| Hours | Steps wait | Reply at once, within state law | Live chat, but the law applies |
+| Reply limit | 5 replies | 30, then a person | Silence loses the lead |
+| Sender | Per channel | One number per lead | A new number looks fake |
+| Follow-ups | On schedule | A reply or purchase stops them | No reminder after "buying" |
+| Bursts | Each text | Wait 15 s, answer once | People send 3 in a row |
+| Media | Text only | A person takes media | The AI can't hear voice notes |
+| Calls | On schedule | No call during a chat | Two channels look broken |
 
 ## 3. Line health: how the team learns without a dashboard
 
@@ -50,14 +53,14 @@ Tadas Vinckas · [Diagrams](diagrams.md) · [Appendix: details, numbers, sources
 ## 5. Which leads get it, and what happens to the rest
 
 - **Today:** every lead gets every channel in the campaign.
-- **Suggestion:** only US/CA numbers with consent, confirmed on iMessage. Phase 2 splits them at random between iMessage and SMS, so iPhones are compared with iPhones.
+- **Suggestion:** only US/CA numbers with consent, on iMessage. Phase 2 splits them at random against SMS.
 - **The rest**, Android included, get the next channel, as today. We log why.
 
 ## 6. First version and time
 
-- **Step 0, before building:** one store, one line, by hand for 2–3 weeks (~$300). Half the iPhone carts get iMessage, half SMS. We build only if replies are at least 2× SMS.
+- **Step 0, before building:** count eligible shoppers, then one line by hand for 2–3 weeks (~$300).
 - **Step 1, in build order:** replies (diagram C), then sending (diagram B), then the 2–3 store pilot.
 - **Waits:** self-serve, billing, a dashboard, media, RCS, countries beyond US/CA.
-- **How long:** 4 weeks for one engineer, 8 with the pilot. The provider contract blocks us.
+- **How long:** 4 weeks of building, 12 from step 0 to the decision. The contract blocks us.
 - **Could slip:** a ban during warm-up, legal answers.
-- **Go:** replies at least 2× SMS, and 2 points more carts recovered.
+- **Go:** replies at least 2× SMS, then 2 points more carts recovered.
