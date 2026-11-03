@@ -230,10 +230,11 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 4. Do the contact-hour and frequency controls already cover state rules (FL, MD, OK, TX)? Do they apply to AI replies?
 5. Where is consent stored?
 6. Is there a common channel interface?
-7. What share of our stores' shoppers use iPhones?
-8. Have you looked at RCS for Business?
-9. How much downside is acceptable if Apple cut iMessage off overnight?
-10. Do you already use Blooio, or have you talked to them?
+7. Does the AI write a step's message when it's due, or earlier? With iMessage, the channel is known only when the step is due.
+8. What share of our stores' shoppers use iPhones?
+9. Have you looked at RCS for Business?
+10. How much downside is acceptable if Apple cut iMessage off overnight?
+11. Do you already use Blooio, or have you talked to them?
 
 ## Sources
 

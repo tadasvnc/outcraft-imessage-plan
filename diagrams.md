@@ -4,12 +4,14 @@ Back to the plan: [README.md](README.md)
 
 **Why B and C:** messages leave a number and replies come back only in these two, so most failures happen here. A is manual in v1, and D is covered by the plan's section 3.
 
+**Where this sits in today's flow:** lead joins a campaign → scheduler: step is due → **B:** iMessage or the next channel → AI writes for that channel → provider sends → **C:** statuses and replies → AI answers. One change to today: for text steps, the AI writes when the step is due, not before, because only then do we know the channel.
+
 **How to read:**
 - 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 the step moves to the next channel
 - **Who does it:** our app, the queue, the AI, the provider, or the lead's phone.
 - **Line X** is the store's iMessage line this lead is pinned to. Every iMessage to the lead comes from it.
 - **Which steps:** iMessage is a fifth channel. When it's on, a lead on iMessage gets every text step, iMessage or SMS, from line X. One number per lead.
-- **Next channel** (blue boxes): SMS from the store's SMS number if the campaign has SMS on, else the campaign's next channel, such as email or a call. That channel's own flow and checks take over.
+- **Next channel** (blue boxes): SMS from the store's SMS number if the campaign has SMS on, else the campaign's next channel, such as email or a call. That channel's own flow and checks take over, and the AI writes the message again for it. An iMessage text is never reused.
 - **Logging:** every refusal, retry, fallback and drop is logged with its reason and the provider's error key.
 
 ---
