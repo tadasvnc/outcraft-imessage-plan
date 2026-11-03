@@ -16,7 +16,7 @@ Back to the plan: [README.md](README.md) · [Diagrams](diagrams.md)
 | Conflict with us | None found | Sells its own iMessage cart recovery to Shopify brands | None found | None found |
 
 **Pick: Blooio**, from step 0 through the pilot, so the line warmed in step 0 carries into the pilot.
-- **Why:** public prices ($195 a line at 6+, no setup fees), live in days, and hard limits with an error code for each rule, so the provider catches our own mistakes. It falls back to SMS only through our own Twilio, so keeping our SMS path is the default.
+- **Why:** public prices ($195 a line at 6+, no setup fees), live in days, and hard limits with an error code for each rule, so the provider catches our own mistakes. It falls back to SMS only through our own Twilio, so we leave that off and fall back through our own channels.
 - **Conditions:** a data agreement (DPA) before any shopper data flows, and its SOC 2 finished before we grow beyond the pilot (its trust page says "in progress"). Otherwise we move to Linq; our provider interface keeps that to about a week.
 - **Plan B: Linq.** It claims SOC 2 Type II, has a 99.95% uptime contract and automatic failover, but no public price.
 - **Not Sendblue:** the July 2026 breach and its competing cart product. **Not Photon:** its pricing page sells cold outreach while its own guide says not to do it.
@@ -39,22 +39,22 @@ Back to the plan: [README.md](README.md) · [Diagrams](diagrams.md)
 - the SOC 2 report itself, the auditor's name and the breach history.
 
 **Provider details that shape the build.** From Blooio's docs (our pick):
-- Before a written reply, a chat allows 3 plain-text messages, and links and media are blocked (`conversation_content_restricted`). Our no-link rule and "two unanswered → SMS" stay inside that.
+- Before a written reply, a chat allows 3 plain-text messages, and links and media are blocked (`conversation_content_restricted`). Our no-link rule and "two unanswered → next channel" stay inside that.
 - The `one_way` rule: over 10 new chats a day (3-day average) with under 40% written replies slows the line, then pauses new chats. Sizing has to allow for it (section F).
 - Its 429 errors such as `conversation_awaiting_reply` aren't temporary, and retrying won't help. Our retry logic reads the error key, not just the status code.
 - The `safety.state_changed` webhook and the health endpoint (polled every 5 minutes) feed our health job.
 - One banned number slows every number on the account for 72 hours (`sibling_ban`), so each store gets its own sub-account.
-- SMS fallback runs only through our own Twilio account. We leave it off and use our SMS path.
+- SMS fallback runs only through our own Twilio account. We leave it off and fall back to the campaign's next channel.
 
 From Linq's docs (plan B):
 - A `phone_number.status_updated` webhook reports health changes (healthy, at risk, critical), so the health job uses Linq's own signal.
 - When Linq picks the line, the recipients of a flagged line move to a fresh one (`failover_flagged`). A `continuation_message` can explain the new number.
-- A flagged Linq number also stops sending SMS, by Linq's help page. One more reason to fall back through our own SMS path.
+- A flagged Linq number also stops sending SMS, by Linq's help page. One more reason to fall back through our own channels.
 - Rate limits return 429 with `Retry-After`. The iMessage check allows one call per 10 seconds.
 
 From Sendblue's docs, if we pick it:
 - A `line_blocked` webhook exists, so the health job uses the provider's own signal.
-- The lookup can answer "indeterminate". We treat that as "not on iMessage" and use SMS.
+- The lookup can answer "indeterminate". We treat that as "not on iMessage" and use the next channel.
 - Webhooks are retried only 3 times, with a 45 s timeout. If our endpoint is down for a few minutes, replies are lost. So a catch-up job pulls recent messages per line every 5 minutes (diagram C).
 - Each message can have its own status URL. We put our message id in it, so a status that arrives before our database write still matches.
 - Typing dots are one API call and add no outbound message, so they are in v1.
@@ -65,15 +65,15 @@ The plan lists the main ones. The full list:
 
 | Risk | What breaks | What we do |
 |---|---|---|
-| **No link before a reply** | iOS disables links from unknown senders until the person replies. Blooio also blocks links and media before a written reply, and allows 3 plain-text messages until then. Our cart message leads with the link. | The first message names the brand, says it's an assistant and asks one short question. For example: "Hi Sam, this is the Glow Shop assistant. You left the blue scarf in your cart. Want me to save it for you?" The link comes after the reply. Two unanswered messages → the next step goes by SMS with the link. |
+| **No link before a reply** | iOS disables links from unknown senders until the person replies. Blooio also blocks links and media before a written reply, and allows 3 plain-text messages until then. Our cart message leads with the link. | The first message names the brand, says it's an assistant and asks one short question. For example: "Hi Sam, this is the Glow Shop assistant. You left the blue scarf in your cart. Want me to save it for you?" The link comes after the reply. Two unanswered messages → the next step goes on the next channel, with the link. |
 | **Apple blocks a line** | Junk reports, bursts and night sends. Every open chat on the line dies too. | New chats per line ramp 10 → 25 → 50 a day over 3 weeks, max 15 an hour, spread out. Consent only, no night sends, a contact card after the first reply. One brand per line, never shared. |
-| **Reply rate** | Too few replies: a line that only sends looks like a bot to Apple. Many replies: more AI calls, longer chats, more handoffs. | Track replies against sends per line. When they drop, the line stops starting new chats. Phase 1 starts every line with two-way chats. A cap of 30 AI replies per chat, then a person. |
+| **Reply rate** | Too few replies: a line that only sends looks like a bot to Apple. Many replies: more AI calls, longer chats, more handoffs. | Track replies against sends per line. When they drop, the line stops starting new chats. The first message asks a question, to invite a reply. Step 0 shows the real rate before we build. A cap of 30 AI replies per chat, then a person. |
 | **One customer's content** | Adult, drug or scam content can get our *whole* provider account closed, with no refund. | Admins check what the brand sells before turning it on (list below). Every AI message passes a content check. Watch opt-outs and "who is this" replies per customer. Sub-account and kill switch per customer. |
-| **Apple ends the channel** | Apple blocks the providers' method for everyone, overnight. | Leads fall back to SMS automatically. We lose the blue bubble, not the leads. See section I. |
-| **Provider down** | Every send fails and retries 3 times, so carts wait. Replies sent while webhooks are down are lost. | If most sends fail for 5 minutes, a circuit breaker turns iMessage off for everyone and steps go by SMS. It turns back on after a test send works. The catch-up job collects missed replies. |
-| **Not enough lines** | Carts go cold within an hour, and 50 a day fills fast. | No free slot within 60 min → that step goes by SMS. Size lines with the formula in section F. |
-| **Lead not on iMessage** | Android (about 4 in 10 US phones), iMessage turned off, numbers outside the US, numbers that moved to Android but are still registered with Apple. | Look the number up before the first send and cache it for 30 days. A downgrade, or no receipt within an hour → clear the cache, next steps by SMS. v1 covers US/CA only. See section C. |
-| **Cost** | Lines are a fixed monthly cost. Long chats also cost more in AI calls. | The pilot splits iPhone leads 50/50 against SMS. See section F. |
+| **Apple ends the channel** | Apple blocks the providers' method for everyone, overnight. | Leads fall back to the next channel automatically. We lose the blue bubble, not the leads. See section I. |
+| **Provider down** | Every send fails and retries 3 times, so carts wait. Replies sent while webhooks are down are lost. | If most sends fail for 5 minutes, a circuit breaker turns iMessage off for everyone and steps go on the next channel. It turns back on after a test send works. The catch-up job collects missed replies. |
+| **Not enough lines** | Carts go cold within an hour, and 50 a day fills fast. | No free slot within 60 min → that step goes on the next channel. Size lines with the formula in section F. |
+| **Lead not on iMessage** | Android (about 4 in 10 US phones), iMessage turned off, numbers outside the US, numbers that moved to Android but are still registered with Apple. | Look the number up before the first send and cache it for 30 days. A downgrade, or no receipt within an hour → clear the cache, next steps on the next channel. v1 covers US/CA only. See section C. |
+| **Cost** | Lines are a fixed monthly cost. Long chats also cost more in AI calls. | The pilot splits iPhone leads 50/50, with and without iMessage. See section F. |
 | **Opt-out** | iMessage has no carrier STOP. | We detect STOP, "unsubscribe" and similar ourselves, opt the lead out on all channels and send one confirmation. |
 | **Webhooks** | Duplicates, late or out-of-order events, missed retries. | Check the signature, skip events we've seen, save then queue. A catch-up job every 5 min pulls missed events and messages with no receipt after an hour. |
 | **State law** | Quiet hours and frequency limits, AI disclosure. | See section E. |
@@ -84,19 +84,18 @@ The plan lists the main ones. The full list:
 **Line health, starting values** (tuned in the pilot):
 - Checked every 15 min: the provider's `line_blocked` event, blocked or declined errors, delivery rate over the last 100 sends, failures in a row, replies against sends, opt-out rate, days with no sends.
 - **Yellow:** delivery under 90%, or opt-outs above 2%. The daily new-chat cap halves, and Slack gets an alert.
-- **Red:** the provider says blocked, 5 failures in a row, or delivery under 70%. No new leads on the line, its chats move to SMS, and Slack and the customer are told. The ops on-call replaces the line within one working day.
-- A replacement line starts its warm-up again, so the store has less iMessage capacity for 2–3 weeks. More of its leads go by SMS meanwhile.
+- **Red:** the provider says blocked, 5 failures in a row, or delivery under 70%. No new leads on the line, its chats move to the next channel, and Slack and the customer are told. The ops on-call replaces the line within one working day.
+- A replacement line starts its warm-up again, so the store has less iMessage capacity for 2–3 weeks. More of its leads go on the next channel meanwhile.
 - A weekly Slack summary per line catches slow decline.
 
 ## C. Android
 
 About 4 in 10 US phones in use are Android (StatCounter, mid-2026: iOS 58–61%, Android 39–42%). The share differs a lot by store: about 87–88% of US teens own an iPhone (Piper Sandler, 2025).
 
-- **iMessage can only reach the iPhone share.** At best it lifts about 6 in 10 US leads. The rest stay on SMS, and we sell it that way.
+- **iMessage can only reach the iPhone share.** At best it lifts about 6 in 10 US leads. The rest stay on the campaign's other channels, and we sell it that way.
 - **Pilot stores with iPhone-heavy shoppers.** We ask each candidate store for its iPhone share of mobile visits; any analytics tool shows it. A line priced per month pays off poorly for a store at 40%.
 - **Compare iPhone with iPhone.** See section G.
-- **Android users never see "prefer iMessage?".** If they tapped it, they would start an SMS chat with the iMessage line, outside our SMS rules. The offer goes only to numbers the lookup confirmed.
-- **Numbers that moved to Android.** Apple can keep a number registered for iMessage after its owner leaves iPhone, until they deregister it. Messages to it vanish, or land on an old iPad or Mac. The 30-day cache makes this worse. No receipt within an hour clears the cache and moves the lead to SMS. The "two unanswered, then SMS" rule catches the rest.
+- **Numbers that moved to Android.** Apple can keep a number registered for iMessage after its owner leaves iPhone, until they deregister it. Messages to it vanish, or land on an old iPad or Mac. The 30-day cache makes this worse. No receipt within an hour clears the cache and moves the lead to the next channel. The "two unanswered, then next channel" rule catches the rest.
 - **SMS to Android is changing too.** Google Messages warns about links from unknown senders and hides suspected scams. It was piloted in 2024 in a few countries, with a wider rollout planned. Our SMS results on Android may get weaker either way.
 - **RCS is the answer for Android.** Business RCS now runs on all major US carriers, through Google Messages on Android. It shows a verified brand name and logo, and allows links and buttons. Carrier approval takes 2–6 weeks. It is the natural next channel for the leads iMessage can't reach. Not confirmed: which US carriers show business RCS on iPhone.
 - **Other markets:** Lithuania is about 63–70% Android, and Australia about 60–64% iPhone. iMessage fits the US, Canada and Australia. In most of the EU, WhatsApp, already a channel, matters more.
@@ -105,8 +104,8 @@ About 4 in 10 US phones in use are Android (StatCounter, mid-2026: iOS 58–61%,
 
 - **A reply or a purchase while a step waits in the queue.** The step is checked again right before it is sent, and dropped if it's no longer wanted (diagram B).
 - **The lead writes to the other number.** After a fallback, a lead may still write to the old iMessage line. We answer where the lead last wrote, with the whole chat history.
-- **A line is blocked mid-chat.** Its chats move to the store's SMS number. The first SMS says it's the same store and why the number changed.
-- **The lead's iMessage uses an email address.** Some people start chats from their Apple ID email, not their number. The "prefer iMessage?" link pre-fills a short code, so we can still match the lead (diagram C).
+- **A line is blocked mid-chat.** Its chats move to the next channel. If that's SMS, the first SMS says it's the same store and why the number changed.
+- **The lead replies from an Apple ID email.** Rare, because we start the chat on their number. If the reply can't be matched, it goes to the inbox and the store links it (diagram C).
 - **An opted-out lead writes again.** A person sees it. No automatic messages until the lead opts back in.
 - **"Is this a bot?"** The AI says it's the store's assistant and offers a person.
 - **Thumbs-up and other reactions.** They count as engagement in line stats, but get no answer.
@@ -132,7 +131,7 @@ About 4 in 10 US phones in use are Android (StatCounter, mid-2026: iOS 58–61%,
 - **Lines needed per store** = eligible leads a day ÷ 40. The cap is 50, and the rest is headroom for spreading sends out and for retries.
 - **With Blooio's reply rule:** if a line's new chats get under 40% written replies, Blooio slows it to about 10 new chats a day. Then the formula is ÷ 10, and a line costs about 4× more per lead. The pilot shows which case applies; step 0 gives a first hint.
 - **Example:** a store with 300 carts a day with consent and a US/CA number. If 55–70% are on iMessage, that is 165–210 leads a day, so **5–6 lines**. In the pilot only half of them get iMessage, so about 3 lines.
-- During warm-up a line takes only 10, then 25, new chats a day. Phase 1 covers part of this period.
+- During warm-up a line takes only 10, then 25, new chats a day, so the pilot's first weeks run at lower volume. The step 0 line starts the pilot already warm.
 - **Cost per line:** about $195–$290 a month (Blooio list price, Linq reported at about $250, Sendblue on request). At about 1,200 new chats a line a month, that is $0.15–$0.25 a lead, against about $0.01 for SMS.
 - **Break-even:** $200 ÷ (1,200 leads × $80 average order) ≈ 0.2 percentage points, or **2 more carts recovered per 1,000 leads**. The $80 is an assumption. That counts all the store's recovered revenue. If Outcraft pays for the line and keeps only its share (say 15%), it needs about **14–17 more carts per 1,000 leads** ($200–$250 a line), about 1.5 points. If the store pays for the line, it needs about 2.5 per 1,000 counting revenue, or about 5 counting profit at a 50% margin. The go bar of 2 points (20 per 1,000) covers every case.
 - **Pilot cost:** 6–10 lines for about 2 months, roughly $2,500–$6,000. We pay it, so stores can join easily.
@@ -140,7 +139,7 @@ About 4 in 10 US phones in use are Android (StatCounter, mid-2026: iOS 58–61%,
 
 ## G. Pilot and go/no-go
 
-Two-sided test, 5% significance, 80% power. The baselines (6% SMS reply rate, 10% recovery) are assumptions until we see Outcraft's own data.
+Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% reply rate, 10% recovery) are assumptions until we see Outcraft's own data.
 
 | What we want to prove | Leads needed (both groups) | Days at 100 eligible a day | Days at 300 a day |
 |---|---|---|---|
@@ -150,13 +149,12 @@ Two-sided test, 5% significance, 80% power. The baselines (6% SMS reply rate, 10
 | Recovery 10% → 12% | 7,682 | 77 | 26 |
 | Recovery 10% → 11% | 29,502 | 296 | 99 |
 
-- **Go:** reply rate at least 2× SMS, and recovery at least 2 points above SMS.
-- **Guardrails:** opt-outs no higher than SMS, and under 1 blocked line per 10 line-months.
+- **What we compare:** the half with iMessage against the half without it, which gets the campaign as today, usually SMS. So the test answers the product question: does adding iMessage recover more carts?
+- **Go:** reply rate at least 2×, and recovery at least 2 points higher.
+- **Guardrails:** opt-outs no higher than without iMessage, and under 1 blocked line per 10 line-months.
 - **Revenue after line costs** is tracked, but proving a 1-point lift needs about 30,000 leads, so it shows direction only.
-- **Both halves are iPhone leads.** Leads are split only after the lookup confirms iMessage. iPhone and Android shoppers differ in age and income, so comparing iMessage with all SMS leads would flatter iMessage.
-- **The SMS half gets no "prefer iMessage?" offer** in phase 2, or the comparison stops being clean.
-- **If lines are the bottleneck,** the SMS group can be up to 3× the iMessage group. For 10% → 12%, that cuts the iMessage leads needed from about 3,840 to about 2,560.
-- **Phase 1 leads are not in the test.** They chose iMessage themselves, so they would flatter it too. Phase 1 measures how many tap the offer and how those chats go.
+- **Both halves are iPhone leads.** Leads are split only after the lookup confirms iMessage. iPhone and Android shoppers differ in age and income, so comparing with all leads would flatter iMessage.
+- **If lines are the bottleneck,** the group without iMessage can be up to 3× the iMessage group. For 10% → 12%, that cuts the iMessage leads needed from about 3,840 to about 2,560.
 - Warm-up limits volume early. If the pilot stores have fewer than about 300 eligible leads a day, we run longer or add a store.
 
 ## H. Rollout
@@ -164,46 +162,37 @@ Two-sided test, 5% significance, 80% power. The baselines (6% SMS reply rate, 10
 | Weeks | Phase | The question it answers |
 |---|---|---|
 | 1–3 | **Step 0:** is it worth it? | Are there enough eligible shoppers, and do they reply? |
-| 4–5 | **Build:** replies (diagram C) | — |
-| 6–7 | **Phase 1:** shoppers write first, while we build sending (diagram B) | Does the system work, and how many shoppers want iMessage? |
-| 8–11 | **Phase 2:** we write first, tested against SMS | Does iMessage recover more carts? |
+| 4–7 | **Build:** replies (diagram C), then sending (diagram B) | — |
+| 8–11 | **Pilot:** we write first, half of the iPhone shoppers get iMessage | Does adding iMessage recover more carts? |
 | 12 | **Decision** | Go or no-go |
 
 **Step 0: is it worth it? (weeks 1–3, about $300, no build)**
 - **Count the eligible shoppers** (a few days): carts with consent and a US/CA number, times the iPhone share from a lookup on about 500 numbers.
-- **Manual test:** one store, one Blooio line, which goes on into the pilot. Half the iPhone carts get iMessage, half get SMS. A person answers, with AI drafts. Dashboard sends skip our consent, Do Not Call and hours checks, so someone checks those by hand.
+- **Manual test:** one store, one Blooio line, which goes on into the pilot. Half the iPhone carts get iMessage, half get the campaign as today. A person answers, with AI drafts. Dashboard sends skip our consent, Do Not Call and hours checks, so someone checks those by hand.
 - **At the same time:** provider contract, data agreement (DPA), legal check on state rules.
-- **Go on if:** a store has at least ~30 eligible shoppers a day, replies are at least 2× SMS, and the line isn't flagged. **Otherwise stop**, or look at RCS.
+- **Go on if:** a store has at least ~30 eligible shoppers a day, replies are at least 2× the other half, and the line isn't flagged.
+- **If cold messages get the line flagged:** plan B, leads write to us first (below).
+- **Otherwise stop**, or look at RCS.
 
-**Build: replies (weeks 4–5)**
-- Provider interface, webhooks with the catch-up job, STOP handling, chat rules (typing dots, 15 s wait, a cap of 30), content check.
-- The "Prefer iMessage?" link in our own SMS and email steps.
+**Build (weeks 4–7)**
+- **Replies first (diagram C), weeks 4–5:** provider interface, webhooks with the catch-up job, STOP handling, chat rules (typing dots, 15 s wait, a cap of 30), content check.
+- **Then sending (diagram B), weeks 6–7:** lookup, per-line limits, no-link rules, health alerts, next-channel fallback, the random split.
 
-**Phase 1: shoppers write first (weeks 6–7)**
+**Pilot: we write first (weeks 8–11)**
 - 2–3 US stores, switched on by our admins. We pay for the lines.
-- SMS and email steps offer "Prefer iMessage? Tap here", only to numbers confirmed on iMessage. The link opens a chat with the store's line and pre-fills a short code. The shopper writes first, so:
-  - links work, and there is no junk banner;
-  - none of the pre-reply rules apply;
-  - Apple stops filtering a sender once the person has replied 3 times;
-  - real two-way chats warm the lines up.
-- **We measure:** how many tap, how chats go, the AI cost per chat, lookup accuracy, line health.
-- **Meanwhile we build sending (diagram B):** lookup, per-line limits, no-link rules, health alerts, SMS fallback.
-- **What phase 1 can't show:** whether iMessage recovers more carts, or how people react when we write first.
-
-**Phase 2: we write first (weeks 8–11)**
-- Cart messages by iMessage on the warmed lines, so about 50 new chats per line a day from the start.
-- A random split between iMessage and SMS, among iPhone shoppers only. If lines are the bottleneck, the SMS group can be up to 3× bigger.
-- **We measure:** replies, recovered carts, opt-outs, blocked lines.
+- Cart messages by iMessage. The step 0 line is already warm. New lines ramp 10 → 25 → 50 a day.
+- A random split among iPhone shoppers only: half get iMessage, half the campaign without it. If lines are the bottleneck, the half without can be up to 3× bigger.
+- **We measure:** replies, recovered carts, opt-outs, blocked lines, AI cost per chat, lookup accuracy.
 
 **Decision (week 12)**
-- **Go if:** replies at least 2× SMS, recovery at least 2 points above SMS, opt-outs no higher than SMS, and under 1 blocked line per 10 line-months (section G).
+- **Go if**, against the half without iMessage: replies at least 2×, recovery at least 2 points higher, opt-outs no higher, and under 1 blocked line per 10 line-months (section G).
 - **Go →** a paid add-on per line, more stores, later self-serve.
-- **No-go →** keep phase 1 only (iMessage for shoppers who ask for it), or stop and look at RCS.
+- **No-go →** plan B (leads write first), or stop and look at RCS.
 - **Before growing beyond the pilot:** Blooio's SOC 2 must be finished, or we move to Linq.
 
 **Other notes:**
-- **The step 0 line is warm by week 4**, so the pilot can use it from day one.
-- **If the team wants less risk:** stop after phase 1. v1 is then replies only, and outbound comes later.
+- **The step 0 line is warm**, so the pilot uses it from day one.
+- **Plan B: leads write first.** If step 0 shows that cold messages get lines flagged, our SMS and email steps offer "Prefer iMessage? Tap here" to numbers confirmed on iMessage. The link opens a chat with the store's line and pre-fills a short code, so we can match the lead. Links work, pre-reply rules don't apply, and two-way chats warm the lines. It isn't in v1: it changes the SMS and email steps, needs the short-code matching, and depends on how many shoppers tap.
 - **If Outcraft already runs iMessage:** skip step 0 and use that data.
 - **Effort:** about 4 weeks of build for one engineer, 3–5 depending on how channel-neutral our code is. Lines for the pilot: $2,500–$6,000.
 
@@ -212,13 +201,13 @@ Two-sided test, 5% significance, 80% power. The baselines (6% SMS reply rate, 10
 - Apple's iCloud terms say the service is for personal use, and forbid automated access and promotional messages. Every iMessage provider runs real Apple IDs against these terms. Outcraft isn't a party to them, but the channel exists only while Apple tolerates it.
 - Precedents: Apple cut off Beeper Mini in December 2023 (a consumer app using fake credentials, a different case), and Lindy's own account was banned within half a day.
 - I found no sign of Apple shutting down managed providers in 2025–26, and Sendblue has run for 5+ years.
-- **So: low chance, high impact.** SMS fallback runs everywhere, a global kill switch exists, and we never sell iMessage as guaranteed.
+- **So: low chance, high impact.** Fallback to the next channel runs everywhere, a global kill switch exists, and we never sell iMessage as guaranteed.
 
 ## J. What waits, and ideas for later
 
 **Waits in v1, and why:**
 - **Self-serve and billing:** needs pilot numbers first.
-- **Moving a chat to a new line:** SMS covers it in v1.
+- **Moving a chat to a new line:** the next channel covers it in v1.
 - **Sending pictures:** not needed to win a reply.
 - **Group chats:** carts are one-to-one.
 - **A second provider:** our interface keeps the switch to about a week.
