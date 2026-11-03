@@ -6,17 +6,18 @@ Back to the plan: [README.md](README.md) · [Diagrams](diagrams.md)
 
 ## A. Provider comparison
 
-| | Sendblue | Linq | Blooio |
-|---|---|---|---|
-| Outbound price | On request (the $100 plan is inbound only) | On request (reported about $250/line) | $289/line, $195 at 6+ lines |
-| New chats per line | 50 a day, 15 an hour, an error code for each rule | 50 a day, max 150 outbound in a row | "20–50 a day" guidance |
-| Track record | SOC 2, HIPAA, 5+ years | Enterprise focus, used by AI-agent companies (Lindy) | Security not stated, about 1 year |
-| Conflict with us | Sells its own iMessage cart recovery to Shopify brands | None found | None found |
+| | Linq | Sendblue | Blooio | Photon |
+|---|---|---|---|---|
+| Outbound price | On request (reported about $250/line) | On request (the $100 plan is inbound only) | $289/line, $195 at 6+ lines | $250/line |
+| New chats per line | About 50 in 24 hours, then the line is marked "at risk" (a warning, not a block) | 50 a day, 15 an hour, max 150 in a row without a reply. An error code for each rule. | No fixed number. Over 10 a day with under 40% replies → slowed, then paused. An error code for each rule. | Up to 50 a day |
+| Line health in the API | Healthy / at risk / critical, a webhook on change, automatic move off a flagged line | A `line_blocked` webhook | A health endpoint and a safety-state webhook | A dashboard. API unclear. |
+| Security | Says SOC 2 Type II (auditor not named). 99.95% uptime in the contract. | SOC 2, HIPAA. **Data breach in July 2026:** message content and phone numbers accessed for some customers, investigation ongoing. | Not SOC 2 certified, by its own blog | No claim on its own pages |
+| Company | Raised about $20M (Feb 2026), 1,000+ teams, used by Lindy. Sells the API since about 2025. | The oldest, 5+ years | Founded 2024 | Small. Open-source core. |
+| Conflict with us | None found | Sells its own iMessage cart recovery to Shopify brands | None found | None found |
 
-**Pick:** Sendblue, if the contract bans it from using our customers' data. Otherwise Linq. Blooio stays a backup.
+**Pick:** Linq, if it shows its SOC 2 Type II report and puts the pre-reply rules in the contract. Sendblue second: the most detailed rules, but the breach and its competing product. Blooio for the cheap manual test, since its prices are public. Photon doesn't fit: its pricing page sells cold outreach while its own guide says not to do it.
 
 **Also looked at:**
-- **Photon:** the same model as the three above.
 - **Our own Mac minis:** rejected. The bans and the hardware would be ours, and one AI company (Lindy) was banned within half a day of launch on its own setup.
 - **Apple Messages for Business:** official, but the shopper must write first, so it can't recover carts. A good fit later for inbound questions from Maps and Safari.
 - **RCS for Business:** official and branded, and it reaches Android. It is not iMessage, so it gets its own look (section C).
@@ -28,9 +29,17 @@ Back to the plan: [README.md](README.md) · [Diagrams](diagrams.md)
 - a data agreement (DPA). Outcraft is based in Lithuania, so GDPR applies even to US leads, and the provider becomes a sub-processor;
 - our customers' data is never used for the provider's own products or marketing;
 - whether their automatic SMS fallback can be turned off. It would skip our own SMS consent and STOP handling;
-- a sub-account and a kill switch per customer, so one brand can't get our whole account closed.
+- a sub-account and a kill switch per customer, so one brand can't get our whole account closed, and in writing that one store's ban can't affect the others;
+- with Linq, a separate pool per store. If we choose the line ourselves, Linq's automatic failover turns off;
+- the SOC 2 report itself, the auditor's name and the breach history.
 
-**Provider details that shape the build** (from Sendblue's docs; to check the same for Linq):
+**Provider details that shape the build.** From Linq's docs:
+- A `phone_number.status_updated` webhook reports health changes (healthy, at risk, critical), so the health job uses Linq's own signal.
+- When Linq picks the line, the recipients of a flagged line move to a fresh one (`failover_flagged`). A `continuation_message` can explain the new number.
+- A flagged Linq number also stops sending SMS, by Linq's help page. One more reason to fall back through our own SMS path.
+- Rate limits return 429 with `Retry-After`. The iMessage check allows one call per 10 seconds.
+
+From Sendblue's docs, if we pick it:
 - A `line_blocked` webhook exists, so the health job uses the provider's own signal.
 - The lookup can answer "indeterminate". We treat that as "not on iMessage" and use SMS.
 - Webhooks are retried only 3 times, with a 45 s timeout. If our endpoint is down for a few minutes, replies are lost. So a catch-up job pulls recent messages per line every 5 minutes (diagram C).
@@ -89,6 +98,9 @@ About 4 in 10 US phones in use are Android (StatCounter, mid-2026: iOS 58–61%,
 - **"Is this a bot?"** The AI says it's the store's assistant and offers a person.
 - **Thumbs-up and other reactions.** They count as engagement in line stats, but get no answer.
 - **One company, several brands.** Lines belong to a brand, so a lead always sees one brand per number.
+- **Bursts.** People send 3 messages in a row. Typing dots, wait 15 s, then one answer.
+- **Photos and voice notes.** They go to a person. The AI can't hear a voice note.
+- **Opt-out scope.** An opt-out covers every channel of that store, not other stores on Outcraft, because consent is given per brand.
 
 ## E. Law
 
@@ -107,7 +119,7 @@ About 4 in 10 US phones in use are Android (StatCounter, mid-2026: iOS 58–61%,
 - **Example:** a store with 300 carts a day with consent and a US/CA number. If 55–70% are on iMessage, that is 165–210 leads a day, so **5–6 lines**. In the pilot only half of them get iMessage, so about 3 lines.
 - During warm-up a line takes only 10, then 25, new chats a day. Phase 1 covers part of this period.
 - **Cost per line:** about $195–$290 a month (Blooio list price, Linq reported at about $250, Sendblue on request). At about 1,200 new chats a line a month, that is $0.15–$0.25 a lead, against about $0.01 for SMS.
-- **Break-even:** $200 ÷ (1,200 leads × $80 average order) ≈ 0.2 percentage points, or **2 more carts recovered per 1,000 leads**. The $80 is an assumption.
+- **Break-even:** $200 ÷ (1,200 leads × $80 average order) ≈ 0.2 percentage points, or **2 more carts recovered per 1,000 leads**. The $80 is an assumption. That counts all the store's recovered revenue. If Outcraft pays for the line and keeps only its share (say 15%), it needs about **14–17 more carts per 1,000 leads** ($200–$250 a line), about 1.5 points.
 - **Pilot cost:** 6–10 lines for about 2 months, roughly $2,500–$6,000. We pay it, so stores can join easily.
 - **Other costs:** longer chats mean more AI calls, ops time for line swaps, and support when a line is blocked.
 
@@ -128,6 +140,7 @@ Two-sided test, 5% significance, 80% power. The baselines (6% SMS reply rate, 10
 - **Revenue after line costs** is tracked, but proving a 1-point lift needs about 30,000 leads, so it shows direction only.
 - **Both halves are iPhone leads.** Leads are split only after the lookup confirms iMessage. iPhone and Android shoppers differ in age and income, so comparing iMessage with all SMS leads would flatter iMessage.
 - **The SMS half gets no "prefer iMessage?" offer** in phase 2, or the comparison stops being clean.
+- **If lines are the bottleneck,** the SMS group can be up to 3× the iMessage group. For 10% → 12%, that cuts the iMessage leads needed from about 3,840 to about 2,560.
 - **Phase 1 leads are not in the test.** They chose iMessage themselves, so they would flatter it too. Phase 1 measures how many tap the offer and how those chats go.
 - Warm-up limits volume early. If the pilot stores have fewer than about 300 eligible leads a day, we run longer or add a store.
 
@@ -144,7 +157,8 @@ Two-sided test, 5% significance, 80% power. The baselines (6% SMS reply rate, 10
   Meanwhile we build sending (diagram B).
 - **Weeks 5–8, phase 2:** outbound cart messages on the warm lines, 50/50 against SMS. The riskiest part, the cold first message, starts last and on the healthiest lines.
 - **If the team wants less risk:** stop after phase 1. v1 is then replies only, and outbound comes later.
-- **Cheapest test of all:** one line and one customer, run by hand from the provider's dashboard, to measure the lift before any build.
+- **Cheapest test of all:** one line and one customer, run by hand from the provider's dashboard, to measure the lift before any build. Dashboard sends skip our consent, STOP and hours checks, so someone checks those by hand. It also gives an early cart-recovery number during the build, which phase 1 can't.
+- **Effort:** about 4 weeks of build for one engineer, 3–5 depending on how channel-neutral our code is.
 
 ## I. Platform risk
 
@@ -186,7 +200,7 @@ Two-sided test, 5% significance, 80% power. The baselines (6% SMS reply rate, 10
 
 ## Sources
 
-- **Providers:** [Sendblue pricing](https://sendblue.com/pricing) · [Sendblue limits](https://docs.sendblue.com/limits/) · [Sendblue API summary](https://docs.sendblue.com/llms.txt) · [Sendblue Recover](https://recover.sendblue.com/) · [Sendblue cart guide](https://www.sendblue.com/blog/imessage-ecommerce-abandoned-cart) · [Sendblue vs Blooio](https://www.sendblue.com/compare/sendblue-vs-blooio) · [Messages for Business vs API](https://www.sendblue.com/blog/apple-messages-for-business-vs-imessage-api) · [Blooio pricing](https://blooio.com/integrations/api/pricing) · [Blooio vs Sendblue](https://blooio.com/alternatives/sendblue) · [Linq rate limits](https://docs.linqapp.com/guides/platform/rate-limits/index.md) · [Linq vs Sendblue](https://linqapp.com/s/linq-vs-sendblue) · [Linq flagged number](https://help.linqapp.com/flagged-number) · [Photon deliverability](https://photon.codes/docs/best-practices/imessage-deliverability)
+- **Providers:** [Sendblue pricing](https://sendblue.com/pricing) · [Sendblue limits](https://docs.sendblue.com/limits/) · [Sendblue API summary](https://docs.sendblue.com/llms.txt) · [Sendblue Recover](https://recover.sendblue.com/) · [Sendblue cart guide](https://www.sendblue.com/blog/imessage-ecommerce-abandoned-cart) · [Sendblue vs Blooio](https://www.sendblue.com/compare/sendblue-vs-blooio) · [Messages for Business vs API](https://www.sendblue.com/blog/apple-messages-for-business-vs-imessage-api) · [Blooio pricing](https://blooio.com/integrations/api/pricing) · [Blooio vs Sendblue](https://blooio.com/alternatives/sendblue) · [Linq rate limits](https://docs.linqapp.com/guides/platform/rate-limits/index.md) · [Linq vs Sendblue](https://linqapp.com/s/linq-vs-sendblue) · [Linq flagged number](https://help.linqapp.com/flagged-number) · [Photon deliverability](https://photon.codes/docs/best-practices/imessage-deliverability) · [Sendblue incident report](https://www.sendblue.com/blog/sendblue-security-incident-update) · [Linq phone reputation](https://docs.linqapp.com/guides/phone-numbers/phone-reputation/) · [Linq sending and failover](https://docs.linqapp.com/channel/imessage/guides/messaging/sending-messages/index.md) · [Linq iMessage API](https://linqapp.com/imessage-api) · [Blooio messaging safety](https://docs.blooio.com/guides/messaging-safety) · [Blooio API pricing](https://blooio.com/integrations/api/pricing) · [Photon pricing](https://photon.codes/pricing)
 - **Apple:** [iCloud terms](https://www.apple.com/legal/internet-services/icloud/) · [Unknown senders, iOS 26](https://support.apple.com/en-in/125068) · [Twilio: iOS 26 and business messaging](https://www.twilio.com/en-us/blog/insights/trends/potential-ios-26-update-communications-implications) · [iMessage link protection (Bitdefender)](https://bitdefender.in/iphone-users-tricked-into-disabling-apple-imessages-phishing-protection) · [Deregister iMessage (Apple)](https://selfsolve.apple.com/deregister-imessage) · [Beeper Mini (MacRumors)](https://www.macrumors.com/2023/12/10/apple-confirms-it-shut-down-beeper-mini/) · [Lindy: three rewrites, one Apple ban](https://www.lindy.ai/blog/imessage-api-three-rewrites-one-apple-ban-and-what-actually-works)
 - **Android and RCS:** [US mobile OS share (StatCounter)](https://gs.statcounter.com/os-market-share/mobile/united-states-of-america) · [Teen iPhone ownership (MacRumors, Piper Sandler)](https://www.macrumors.com/2025/04/09/teen-iphone-ownership-continues-to-soar/) · [Lithuania mobile OS share (StatCounter)](https://gs.statcounter.com/os-market-share/mobile/lithuania) · [Australia mobile OS share (StatCounter)](https://gs.statcounter.com/os-market-share/mobile/australia) · [Google Messages protections (Google Security Blog)](https://security.googleblog.com/2024/10/5-new-protections-on-google-messages.html) · [RCS on all US carriers (Twilio)](https://www.twilio.com/en-us/blog/products/RCS-ATT-Integration) · [RCS on iOS 18.1 (Twilio)](https://www.twilio.com/en-us/blog/insights/trends/rcs-business-messaging-apple-update) · [Apple and RCS (Sinch)](https://sinch.com/blog/apple-support-rcs/) · [Attentive RCS](https://ecommercenews.com.au/story/attentive-launches-ai-tools-for-rcs-message-rollout)
 - **Law:** [Postscript: Florida rules](https://postscript.io/blog/florida-compliance-changes) · [State quiet hours (Referrizer)](https://support.referrizer.com/article/tcpa-quiet-hours-and-state-specific-rules-for-text-campaigns) · [FCC revoke-all delay (BHFS)](https://www.bhfs.com/insight/fcc-extends-compliance-deadline-for-revoke-all-rule/) · [Texas SB 140 (Morgan Lewis)](https://www.morganlewis.com/pubs/2025/09/texas-telephone-solicitation-law-now-covers-text-messages) · [AI disclosure laws (DLA Piper)](https://www.dlapiper.com/en/insights/publications/2026/01/ai-disclosure-laws-on-chatbots-are-on-the-rise-key-takeaways-for-companies)
