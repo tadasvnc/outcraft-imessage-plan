@@ -2,9 +2,9 @@
 
 Back to the plan: [README.md](README.md)
 
-**Why B and C:** these are where a message actually leaves a number and where replies come back. Most failures happen here, and so does the live-chat behaviour. A (setting up lines) is done by our admins by hand in v1. D (line health) is covered by the automatic rules in the plan, section 3. In pilot weeks 1–2 only C runs: leads who tap "prefer iMessage?" write first and enter at its top. B starts in week 3.
+**Why B and C:** these are where a message actually leaves a number and where replies come back. Most failures happen here, and so does the live-chat behaviour. A (setting up lines) is done by our admins by hand in v1. D (line health) is covered by the automatic rules in the plan, section 3. In phase 1 only C runs: leads who tap "prefer iMessage?" write first and enter at its top. B starts in phase 2.
 
-**How to read:** a circle is the start or an end. A diamond is a question with yes and no arrows. A box is an action, and the bold text says **who** does it: our app, the queue, the AI, the provider, or the lead's phone. Green boxes mark the moment a message actually leaves a number, and which number.
+**How to read:** a circle is the start or an end. A diamond is a question with yes and no arrows. A box is an action, and the bold text says **who** does it: our app, the queue, the AI, the provider, or the lead's phone. Green boxes mark the moment a message actually leaves a number, and which number. A box that sends "by SMS" hands the step to our existing SMS flow, which sends it from the customer's SMS number.
 
 ---
 
@@ -15,9 +15,9 @@ flowchart TD
     S(("Campaign step<br/>is due")) --> A1["<b>Scheduler → Queue</b><br/>picks up the step job"]
     A1 --> Q0{"Already sent?<br/>same message id"}
     Q0 -- yes --> E0((End))
-    Q0 -- no --> Q1{"Outbound iMessage switched on<br/>globally, for the customer and<br/>the campaign, and a live line?<br/>off in pilot weeks 1–2"}
+    Q0 -- no --> Q1{"Outbound iMessage switched on<br/>globally, for the customer and<br/>the campaign, and a live line?<br/>off in phase 1"}
     Q1 -- no --> F1["<b>Our app</b><br/>uses the campaign's next channel"] --> E1((End))
-    Q1 -- yes --> Q2{"US/CA number, has consent,<br/>not opted out, not already<br/>in an SMS chat? pilot:<br/>not FL, MD or OK"}
+    Q1 -- yes --> Q2{"US/CA number, has consent,<br/>not opted out, not texting<br/>with us from another number?<br/>pilot: not FL, MD or OK"}
     Q2 -- no --> F2["<b>Our app</b><br/>uses next channel, logs why"] --> E2((End))
     Q2 -- yes --> Q3{"iMessage result cached<br/>in last 30 days?"}
     Q3 -- no --> L1["<b>Provider</b><br/>lookup: is this number on iMessage?"] --> L2["<b>Our app</b><br/>saves the result"] --> Q4
@@ -37,7 +37,7 @@ flowchart TD
     Q9 -- yes --> F5["<b>Our app</b><br/>sends this step by SMS<br/>while the cart is fresh"] --> E6((End))
     Q9 -- no --> R2["<b>Queue</b><br/>tries again in 10 min"] --> E7((End))
 
-    Q10{"Has the lead ever<br/>replied on line X?"}
+    Q10{"Has the lead ever<br/>written to line X?"}
     Q10 -- yes --> AI2["<b>AI</b><br/>writes the full message,<br/>checkout link allowed"] --> QC
     Q10 -- no --> Q11{"Already 2 iMessages<br/>with no reply?"}
     Q11 -- yes --> F6["<b>Our app</b><br/>moves the lead to SMS,<br/>sends with the link"] --> E8((End))
@@ -51,7 +51,9 @@ flowchart TD
 
     Q12{"Free sending slot<br/>on line X right now?"}
     Q12 -- no --> R3["<b>Queue</b><br/>waits a few seconds"] --> Q12
-    Q12 -- yes --> SEND["<b>Our app → Provider API</b><br/>send from line X"]
+    Q12 -- yes --> QS{"Step still wanted?<br/>no reply or purchase<br/>since it was due"}
+    QS -- no --> X3["<b>Queue</b><br/>drops the step, logs why"] --> E14((End))
+    QS -- yes --> SEND["<b>Our app → Provider API</b><br/>send from line X"]
     SEND --> Q13{"Provider<br/>accepted it?"}
     Q13 -- yes --> OK2["<b>Our app</b><br/>saves provider id,<br/>pins the lead to line X"]
     OK2 --> OUT["<b>Provider</b><br/>MESSAGE LEAVES LINE X"]:::out
@@ -79,7 +81,7 @@ If the diagram doesn't render: [diagram-b.png](diagram-b.png)
 ```mermaid
 flowchart TD
     S(("Lead's phone<br/>writes, or a delivery<br/>receipt comes back")) --> P1["<b>Provider</b><br/>receives it on line X,<br/>sends a webhook to our app"]
-    S2(("Every 5 min: catch-up job.<br/><b>Our app</b> lists recent<br/>messages per line from<br/>the provider")) --> Q2
+    S2(("Every 5 min: catch-up job.<br/><b>Our app</b> pulls missed events<br/>and messages with no<br/>receipt after 1 hour")) --> Q2
     P1 --> Q1{"Signature<br/>valid?"}
     Q1 -- no --> X1["<b>Our app</b><br/>rejects it, logs"] --> E1((End))
     Q1 -- yes --> Q2{"Seen this<br/>event id before?"}
@@ -92,17 +94,18 @@ flowchart TD
     Q4a -- yes --> D4
     Q4a -- no --> Q4{"Status:<br/>delivered?"}
     Q4 -- yes --> D1["<b>Queue</b><br/>marks message delivered,<br/>updates line stats"] --> E3((End))
-    Q4 -- no --> Q5{"Went as SMS or<br/>not on iMessage?"}
-    Q5 -- yes --> D2["<b>Queue</b><br/>marks lead not on iMessage,<br/>next steps go by SMS"] --> E4((End))
+    Q4 -- no --> Q5{"Went as SMS, not on<br/>iMessage, or no receipt<br/>after 1 hour?"}
+    Q5 -- yes --> D2["<b>Queue</b><br/>marks lead not on iMessage,<br/>clears the lookup cache,<br/>next steps go by SMS"] --> E4((End))
     Q5 -- no --> D3["<b>Queue</b><br/>marks message failed,<br/>counts against the line"] --> Q6{"Line now<br/>in red?"}
     Q6 -- yes --> D4["<b>Our app</b><br/>stops new leads on the line,<br/>moves its chats to SMS,<br/>alerts Slack and the customer"] --> E5((End))
     Q6 -- no --> D5["<b>Queue</b><br/>sends the step by SMS"] --> E6((End))
 
     %% Reply branch
-    Q3 -- yes --> Q7{"Number matches a lead<br/>of this line's customer?<br/>also leads who tapped<br/>'prefer iMessage?'"}
+    Q3 -- yes --> Q7{"Number, or the code in<br/>a 'prefer iMessage?' text,<br/>matches a lead of this<br/>line's customer?"}
     Q7 -- no --> R1["<b>Our app</b><br/>saves to the inbox,<br/>tells the customer"] --> E7((End))
     Q7 -- yes --> Q8{"Asks to stop?<br/>STOP, unsubscribe..."}
-    Q8 -- yes --> R2["<b>Our app</b><br/>opts the lead out on all channels,<br/>cancels steps, sends 1 confirmation<br/>from line X"] --> E8((End))
+    Q8 -- yes --> R2["<b>Our app</b><br/>opts the lead out on all channels,<br/>cancels steps"] --> OUT2["<b>Provider</b><br/>1 CONFIRMATION LEAVES LINE X"]:::out
+    OUT2 --> E8((End))
     Q8 -- no --> R3["<b>Our app</b><br/>pins the lead to line X,<br/>cancels scheduled steps,<br/>marks lead 'in chat',<br/>no-link rule lifts"]
     R3 --> Q9{"A person is handling<br/>this lead, or 30 AI<br/>replies reached?"}
     Q9 -- yes --> R4["<b>Our app</b><br/>notifies the person,<br/>AI stays quiet"] --> E9((End))
