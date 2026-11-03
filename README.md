@@ -24,7 +24,7 @@ Tadas Vinckas · [Diagrams](diagrams.md) · [Appendix: details, numbers, sources
 | **Few replies look like a bot** | A line whose replies halve starts no new chats. |
 | **One store gets us all banned** | Admins check each store. A kill switch per store. |
 | **STOP and state law** | Our own STOP check, the SMS law checks, no FL/MD/OK. |
-| **Cost:** $0.20 vs $0.01 a lead | A line pays off at 2 more carts per 1,000 leads. |
+| **Cost:** $0.20 vs $0.01 a lead | Pays off for us at about 15 more carts per 1,000 leads. |
 
 | Live chat changes | Today | Suggestion | Why |
 |---|---|---|---|

@@ -119,7 +119,7 @@ About 4 in 10 US phones in use are Android (StatCounter, mid-2026: iOS 58–61%,
 - **Example:** a store with 300 carts a day with consent and a US/CA number. If 55–70% are on iMessage, that is 165–210 leads a day, so **5–6 lines**. In the pilot only half of them get iMessage, so about 3 lines.
 - During warm-up a line takes only 10, then 25, new chats a day. Phase 1 covers part of this period.
 - **Cost per line:** about $195–$290 a month (Blooio list price, Linq reported at about $250, Sendblue on request). At about 1,200 new chats a line a month, that is $0.15–$0.25 a lead, against about $0.01 for SMS.
-- **Break-even:** $200 ÷ (1,200 leads × $80 average order) ≈ 0.2 percentage points, or **2 more carts recovered per 1,000 leads**. The $80 is an assumption. That counts all the store's recovered revenue. If Outcraft pays for the line and keeps only its share (say 15%), it needs about **14–17 more carts per 1,000 leads** ($200–$250 a line), about 1.5 points.
+- **Break-even:** $200 ÷ (1,200 leads × $80 average order) ≈ 0.2 percentage points, or **2 more carts recovered per 1,000 leads**. The $80 is an assumption. That counts all the store's recovered revenue. If Outcraft pays for the line and keeps only its share (say 15%), it needs about **14–17 more carts per 1,000 leads** ($200–$250 a line), about 1.5 points. If the store pays for the line, it needs about 2.5 per 1,000 counting revenue, or about 5 counting profit at a 50% margin. The go bar of 2 points (20 per 1,000) covers every case.
 - **Pilot cost:** 6–10 lines for about 2 months, roughly $2,500–$6,000. We pay it, so stores can join easily.
 - **Other costs:** longer chats mean more AI calls, ops time for line swaps, and support when a line is blocked.
 
