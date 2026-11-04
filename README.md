@@ -19,7 +19,8 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 | Risk | What breaks | What we do |
 |---|---|---|
 | **Apple blocks a line** | Junk reports or bursts block the number. Its chats drop. | New chats ramp 10 → 25 → 50 a day. Consent only, no nights. |
-| **Not enough lines** | A line starts about 50 new chats a day. Carts go cold in an hour. | No free line within 60 min → the next channel. About 1 line per 40 leads a day. |
+| **Not enough lines** | A line starts about 50 new chats a day. Carts go cold in an hour. | Lines full for the day → the next channel at once. About 1 line per 40 leads a day. |
+| **Slow fallback** | A failed iMessage waits while the cart goes cold. | Fallback jumps the queue: under 2 min. No receipt in 15 min → the next channel too. |
 | **No link before a reply** | iPhones disable links from strangers. | One short question first. The link after a reply, or on the next channel. |
 | **Lead not on iMessage** | About 4 in 10 US phones are Android. | We look it up first. Not on iMessage → the next channel, usually SMS. |
 | **Few replies** | One-way lines look like bots. | The first message asks a question. Replies halve → no new chats. |
@@ -40,7 +41,7 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 ## 3. Line health: how the team learns without a dashboard
 
 - **Today:** there are no iMessage lines yet, so there is nothing to watch.
-- **Suggestion:** every 15 minutes a job reads the provider's line warnings and our own numbers, and acts on its own:
+- **Suggestion:** every 15 minutes a job reads the provider's warnings and our numbers, and acts:
   - **Yellow** (delivery under 90% or opt-outs over 2%): halve the daily limit, alert Slack.
   - **Red** (provider says blocked, or delivery under 70%): no new leads, chats move to the next channel, alert Slack and the store.
 - **Why:** the system acts first and Slack tells the team. On-call only replaces red lines, within a day.
