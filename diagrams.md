@@ -7,7 +7,7 @@ Back to the plan: [README.md](README.md)
 **Where this sits in today's flow:** lead joins a campaign → before each text step, the **iMessage check** → AI writes today's message as usual, plus an iMessage version if the lead can get it → scheduler: step is due → **B:** send-time checks, then iMessage from line X, or the step goes back to the campaign → **C:** statuses and replies → AI answers. Leads who can't get iMessage keep today's path.
 
 **How to read:**
-- 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 today's path: the step goes back to the campaign and runs as if iMessage were off
+- 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 today's path: the step runs as if iMessage were off, the campaign's way, never from line X
 - **Today's path** (🟦 blue boxes): what Outcraft does today, without iMessage. The step goes back to the campaign and runs as if iMessage were off, with the campaign's own channel, settings, frequency caps and checks. Often that's SMS from the store's own number, sometimes a call. The campaign decides, not B. The message is already written, so it goes at once, with no AI call.
   - **Scheduler → today's path:** the lead never got an iMessage version (Android, no consent). Nothing changes for them.
   - **Our app → today's path:** iMessage was possible, but a send-time check or the provider said no. Our app hands the step back at once and logs why.
@@ -39,7 +39,7 @@ flowchart TD
     A1 --> Q0{"Today's checks pass?<br/>not sent yet, no reply, purchase<br/>or opt-out since it was written,<br/>inside the frequency cap"}
     Q0 -- no --> X3("<b>Scheduler</b><br/>drops or holds the step,<br/>as today, logs why") --> E0(("<b>End</b>"))
     Q0 -- yes --> QV{"iMessage version<br/>ready?"}
-    QV -- no --> SMS0("<b>Scheduler → today's path</b><br/>runs the step as today,<br/>from the store's own number"):::sms --> E1(("<b>End</b>"))
+    QV -- no --> SMS0("<b>Scheduler → today's path</b><br/>runs the step as if<br/>iMessage were off"):::sms --> E1(("<b>End</b>"))
     QV -- yes --> QI{"iMessage still on?<br/>global switch, store, campaign"}
     QI -- no --> SMS1("<b>Our app → today's path</b><br/>hands the step back to the<br/>campaign: it runs as if<br/>iMessage were off"):::sms --> E2(("<b>End</b>"))
     QI -- yes --> Q7{"Line X<br/>healthy?"}
@@ -74,7 +74,7 @@ flowchart TD
     linkStyle 2,5,8,11,15,17,24,26,30 color:#b91c1c,stroke:#6b7280
 ```
 
-🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 today's path: the step goes back to the campaign and runs as if iMessage were off
+🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 today's path: the step runs as if iMessage were off, the campaign's way, never from line X
 
 If the diagram doesn't render: [diagram-b.png](diagram-b.png)
 
@@ -145,6 +145,6 @@ flowchart TD
     linkStyle 4,9,11,13,16,19,22,26,29,35,39,43,46,47,49,52,59 color:#b91c1c,stroke:#6b7280
 ```
 
-🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 today's path: the step goes back to the campaign and runs as if iMessage were off
+🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 today's path: the step runs as if iMessage were off, the campaign's way, never from line X
 
 If the diagram doesn't render: [diagram-c.png](diagram-c.png)
