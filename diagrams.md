@@ -121,7 +121,7 @@ flowchart TD
         Q11 -- no --> QS{"Still OK to send now?<br/>the campaign's shared check, as for SMS:<br/>not sent yet, and since it was written<br/>the lead hasn't replied, bought or opted out"}
         QS -- no --> XS("<b>Our app</b><br/>drops the answer, logs why.<br/>A newer message gets<br/>its own answer") --> ES(("<b>End</b>"))
         QS -- yes --> Q12{"iMessage still on,<br/>and line X healthy?"}:::new
-        Q12 -- no --> R6("<b>AI → campaign</b><br/>rewrites the answer,<br/>says it's the same store,<br/>hands it back like B"):::sms --> E10(("<b>End</b>"))
+        Q12 -- no --> R6("<b>AI → campaign</b><br/>rewrites it for the other<br/>text channel, adds 'same<br/>store, new number', the<br/>campaign sends it as usual"):::sms --> E10(("<b>End</b>"))
         Q12 -- yes --> R7("<b>Queue</b><br/>priority send on line X,<br/>campaign hours skipped,<br/>our message id stops double sends"):::new
         R7 --> Q13{"Provider accepted it?<br/>temporary errors retried<br/>after 10 s, 30 s, 60 s,<br/>like diagram B"}:::new
         Q13 -- no --> R6
@@ -138,9 +138,9 @@ flowchart TD
         Q4 -- no --> Q5{"Provider says: not<br/>on iMessage?"}:::new
         Q5 -- no --> D3("<b>Queue</b><br/>the message failed: marks it,<br/>counts it for line health, logs"):::new --> QK
         Q5 -- yes --> DM("<b>Queue</b><br/>marks the lead<br/>not on iMessage"):::new --> QK
-        QK{"Was it a campaign step?<br/>not a chat answer"}:::new
-        QK -- yes --> D5("<b>Our app → campaign</b><br/>hands the step back now:<br/>the fallback, like B"):::sms --> E6(("<b>End</b>"))
-        QK -- no --> RA("<b>AI → campaign</b><br/>rewrites the chat answer,<br/>says it's the same store,<br/>hands it back like B"):::sms --> E4(("<b>End</b>"))
+        QK{"Was it a scheduled message?<br/>yes: a campaign step from B<br/>no: our reply in a chat (C2)"}:::new
+        QK -- yes --> D5("<b>Our app → campaign</b><br/>sends the fallback<br/>written ahead, like B"):::sms --> E6(("<b>End</b>"))
+        QK -- no --> RA("<b>AI → campaign</b><br/>rewrites it for the other<br/>text channel, adds 'same<br/>store, new number', the<br/>campaign sends it as usual"):::sms --> E4(("<b>End</b>"))
         D4("<b>Our app</b><br/>stops new leads on the line,<br/>moves its chats to the fallback,<br/>alerts Slack and the store"):::new --> E5(("<b>End</b>"))
     end
 
