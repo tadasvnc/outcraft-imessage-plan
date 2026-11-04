@@ -11,8 +11,9 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 
 - **Today:** no provider yet.
 - **Compared** on price, limits, health data, security: Blooio, Linq, Sendblue, Photon, own Macs.
-- **Suggestion: Blooio**, with a data agreement and only the data a message needs. Plan B: Linq.
+- **Suggestion: Blooio** for step 0 and the pilot, with a data agreement and only the data a message needs.
 - **Why:** the only public price, the lowest at volume, live in days, hard limits that catch our mistakes.
+- **Not Linq yet:** one iMessage check per 10 seconds is too slow for us. We compare again at scale.
 - **Not Sendblue:** it competes with us, selling iMessage cart recovery to stores. And a 2026 breach.
 
 ## 2. Risks: what breaks at volume, and what we do
@@ -22,11 +23,11 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 | **Apple blocks a line** | Junk reports or bursts block the number. Its chats drop. | New chats ramp 10 → 25 → 50 a day. Consent only, no nights. |
 | **Not enough lines** | A line starts about 50 new chats a day. Carts go cold in an hour. | Lines full → the SMS version at once. About 1 line per 40 leads a day. |
 | **Failed iMessage** | A failed message waits while the cart goes cold. | The SMS version goes at once. No receipt → no resend; the next step goes by SMS. |
-| **No link before a reply** | iPhones disable links from strangers. | One short question first. The link after a reply, or on the next channel. |
-| **Lead not on iMessage** | About 4 in 10 US phones are Android. | We look it up first. Not on iMessage → the next channel, usually SMS. |
+| **No link before a reply** | iPhones disable links from strangers. | A short question first, the link after a reply. |
+| **Lead not on iMessage** | About 4 in 10 US phones are Android. | We look it up first. Not on iMessage → SMS. |
 | **Few replies** | One-way lines look like bots. | The first message asks a question. Replies halve → no new chats. |
 | **One bad store** | It can get our account closed. | Admin check, a sub-account per store. |
-| **STOP and state law** | No carrier catches STOP. Some states limit hours. | We catch STOP ourselves and use the SMS law checks. |
+| **STOP and state law** | No carrier catches STOP. Some states limit hours. | We catch STOP; SMS law checks apply. |
 | **Cost** | $0.20 a lead, against $0.01 for SMS. | It pays off for us at about 15 more carts per 1,000 leads. |
 
 ### Edge cases: where iMessage needs other rules than today
@@ -41,7 +42,6 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 
 ## 3. Line health: how the team learns without a dashboard
 
-- **Today:** there are no iMessage lines yet, so there is nothing to watch.
 - **Suggestion:** every 15 minutes a job reads the provider's warnings and our numbers, and acts:
   - **Yellow** (delivery under 90% or opt-outs over 2%): halve the daily limit, alert Slack.
   - **Red** (blocked, or delivery under 70%): no new leads, chats to SMS, alert Slack and the store.
