@@ -210,6 +210,7 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 **Waits in v1, and why:**
 - **Self-serve and billing:** needs pilot numbers first.
 - **More than one line per store:** needs line choice and pinning each lead to one line. One line fits the pilot.
+- **Waiting for a free slot:** in v1, no slot on line X hands the step back at once, like every other "no". If the pilot shows many such hand-backs (for example, when sending hours open), we add a short wait for the next slot, at most an hour.
 - **Moving a chat to a new line:** the next channel covers it in v1.
 - **Sending pictures:** not needed to win a reply.
 - **Group chats:** carts are one-to-one.

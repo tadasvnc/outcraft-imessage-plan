@@ -48,7 +48,7 @@ flowchart TD
     Q6 -- yes --> SEND("<b>Our app → Provider API</b><br/>sends the iMessage version<br/>from line X")
     Q6 -- no --> Q8{"New-chat slot free on line X?<br/>today's cap 10 → 25 → 50<br/>in warm-up, 15 an hour"}
     Q8 -- yes --> SEND
-    Q8 -- no --> SMS3("<b>Our app → today's path</b><br/>hands the step back now,<br/>no waiting: the cart is fresh"):::sms --> E5(("<b>End</b>"))
+    Q8 -- no --> SMS3("<b>Our app → today's path</b><br/>hands the step back now:<br/>no free slot on line X"):::sms --> E5(("<b>End</b>"))
     SEND --> Q13{"Provider<br/>accepted it?"}
     Q13 -- yes --> OK2("<b>Our app</b><br/>saves the provider id.<br/>The lead now has a chat<br/>on line X")
     OK2 --> OUT("<b>Provider</b><br/>the iMessage leaves line X"):::out
