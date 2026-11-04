@@ -14,6 +14,7 @@ Back to the plan: [README.md](README.md)
   - **AI → today's path** (diagram C): line X fails mid-chat, so the AI rewrites its answer for the campaign's other text channel.
 - **Who does it:** our app, the scheduler, the queue, the AI, the provider, or the lead's phone.
 - **Line X** is the store's iMessage line: one per store in v1, like its one SMS number. Every iMessage to the store's leads comes from it.
+- **iMessage switches:** one for everyone on Outcraft (our team, or the circuit breaker when the provider is down), one per store (our admins), one per campaign. All three must be on.
 - **Which steps:** iMessage is a fifth channel. A text step is an SMS step or an iMessage step. A campaign can add iMessage steps, each with a fallback the campaign sets (SMS or a call). For a lead on iMessage, SMS steps also go from line X. One number per lead: after a hand-back, the lead's next steps run as today.
 - **Today's message:** what the campaign sends without iMessage. For an SMS step, the AI writes it as today. For an iMessage step, it's the message for its fallback (nothing to write for a call). The AI also writes an iMessage version.
 - **What B leaves to today's system:** sending hours and state legal hours (the scheduler fires the step inside them), opt-out and frequency caps (today's checks). B adds only the iMessage on-switch and line X's limits.
@@ -40,7 +41,7 @@ flowchart TD
     Q0 -- no --> X3("<b>Scheduler</b><br/>drops or holds the step,<br/>as today, logs why") --> E0(("<b>End</b>"))
     Q0 -- yes --> QV{"iMessage version<br/>ready?"}
     QV -- no --> SMS0("<b>Scheduler → today's path</b><br/>runs the step as if<br/>iMessage were off"):::sms --> E1(("<b>End</b>"))
-    QV -- yes --> QI{"iMessage still on?<br/>global switch, store, campaign"}
+    QV -- yes --> QI{"iMessage still on?<br/>for everyone, this store,<br/>this campaign"}
     QI -- no --> SMS1("<b>Our app → today's path</b><br/>hands the step back to the<br/>campaign: it runs as if<br/>iMessage were off"):::sms --> E2(("<b>End</b>"))
     QI -- yes --> Q7{"Line X<br/>healthy?"}
     Q7 -- no --> SMS2("<b>Our app → today's path</b><br/>hands the step back now,<br/>logs why"):::sms --> E4(("<b>End</b>"))
