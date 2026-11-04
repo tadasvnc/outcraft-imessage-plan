@@ -2,16 +2,16 @@
 
 Back to the plan: [README.md](README.md)
 
-**Why B and C:** messages leave a number and replies come back only in these two, so most failures happen here. A is manual in v1, and D is covered by the plan's section 3.
+**Why B and C:** messages leave a number and replies come back only in these two, so most failures happen here. A is manual in v1, and D is covered by the plan's section 3. **B2** is the end of B: where a step goes when iMessage can't take it.
 
-**Where this sits in today's flow:** lead joins a campaign → scheduler: step is due → **B:** iMessage or the next channel → AI writes for that channel → provider sends → **C:** statuses and replies → AI answers. One change to today: for text steps, the AI writes when the step is due, not before, because only then do we know the channel.
+**Where this sits in today's flow:** lead joins a campaign → scheduler: step is due → **B:** iMessage, or the next channel (**B2**) → AI writes for that channel → provider sends → **C:** statuses and replies → AI answers. One change to today: for text steps, the AI writes when the step is due, not before, because only then do we know the channel.
 
 **How to read:**
-- 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 the step moves to the next channel
+- 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 the step moves to the next channel · dashed 🟦 → B2: continues in diagram B2
 - **Who does it:** our app, the queue, the AI, the provider, or the lead's phone.
 - **Line X** is the store's iMessage line this lead is pinned to. Every iMessage to the lead comes from it.
 - **Which steps:** iMessage is a fifth channel. When it's on, a lead on iMessage gets every text step, iMessage or SMS, from line X. One number per lead.
-- **Next channel** (blue boxes): SMS from the store's SMS number if the campaign has SMS on, else the campaign's next channel, such as email or a call. That channel's own flow and checks take over, and the AI writes the message again for it. An iMessage text is never reused.
+- **Next channel** (blue boxes): the step continues in diagram B2. It goes by SMS from the store's SMS number if the campaign has SMS on, else on the campaign's next channel, such as email or a call. The AI writes the message again for that channel. An iMessage text is never reused.
 - **No waiting on fallback:** it's a new job on the priority queue, due now, not back on the campaign schedule. From a failed iMessage to the next channel's message takes under 2 minutes.
 - **Logging:** every refusal, retry, fallback and drop is logged with its reason and the provider's error key.
 
@@ -26,33 +26,33 @@ flowchart TD
     A1 --> Q0{"Already sent?<br/>same message id"}
     Q0 -- yes --> E0(("<b>End</b>"))
     Q0 -- no --> Q1{"iMessage on globally,<br/>for the store and the campaign,<br/>with a live line?"}
-    Q1 -- no --> F1("<b>Our app</b><br/>hands the step to the campaign's<br/>next channel, no iMessage sent") --> E1(("<b>End</b>"))
+    Q1 -- no --> F1("<b>Our app</b><br/>hands the step to the campaign's<br/>next channel, no iMessage sent"):::sms --> E1(["<b>→ B2</b><br/>next channel"])
     Q1 -- yes --> Q2{"US/CA number, consent,<br/>passes Do Not Call, not opted out,<br/>not texting us from another number?<br/>pilot: not FL, MD or OK"}
-    Q2 -- no --> F2("<b>Our app</b><br/>next channel, no iMessage sent,<br/>logs why") --> E2(("<b>End</b>"))
+    Q2 -- no --> F2("<b>Our app</b><br/>next channel, no iMessage sent,<br/>logs why"):::sms --> E2(["<b>→ B2</b><br/>next channel"])
     Q2 -- yes --> Q3{"iMessage result cached<br/>in the last 30 days?"}
     Q3 -- no --> L1("<b>Provider</b><br/>lookup: is this number on iMessage?") --> L2("<b>Our app</b><br/>saves the result") --> Q4
     Q3 -- yes --> Q4{"Lead is on<br/>iMessage?"}
-    Q4 -- no --> F3("<b>Our app</b><br/>sends this step on<br/>the next channel"):::sms --> E3(("<b>End</b>"))
+    Q4 -- no --> F3("<b>Our app</b><br/>sends this step on<br/>the next channel"):::sms --> E3(["<b>→ B2</b><br/>next channel"])
     Q4 -- yes --> QG{"Pilot: in the iMessage group?<br/>picked at random once<br/>per lead, then saved"}
-    QG -- no --> F11("<b>Our app</b><br/>group without iMessage: the step<br/>runs as if iMessage were off,<br/>counted in the test"):::sms --> E15(("<b>End</b>"))
+    QG -- no --> F11("<b>Our app</b><br/>group without iMessage: the step<br/>runs as if iMessage were off,<br/>counted in the test"):::sms --> E15(["<b>→ B2</b><br/>next channel"])
     QG -- yes --> QL{"Inside the lead's<br/>state legal hours?"}
     QL -- no --> R1("<b>Queue</b><br/>moves the step to the next window") --> E4(("<b>End</b>"))
     QL -- yes --> Q5{"Inside campaign hours, or lead<br/>wrote in the last 30 min?"}
     Q5 -- no --> R1
     Q5 -- yes --> Q6{"Lead already has<br/>an iMessage line?"}
     Q6 -- yes --> Q7{"Is that line<br/>healthy?"}
-    Q7 -- no --> F4("<b>Our app</b><br/>sends on the next channel,<br/>logs why"):::sms --> E5(("<b>End</b>"))
+    Q7 -- no --> F4("<b>Our app</b><br/>sends on the next channel,<br/>logs why"):::sms --> E5(["<b>→ B2</b><br/>next channel"])
     Q7 -- yes --> X1("<b>Our app</b><br/>keeps the same line = line X") --> Q10
     Q6 -- no --> Q8{"Any of the store's lines with a<br/>free new-contact slot? daily cap<br/>10 → 25 → 50 in warm-up,<br/>15 an hour"}
     Q8 -- yes --> X2("<b>Our app</b><br/>picks the line with most free slots<br/>= line X") --> Q10
     Q8 -- no --> Q9{"Daily caps all used,<br/>or lead waited<br/>over 10 minutes?"}
-    Q9 -- yes --> F5("<b>Our app</b><br/>sends this step on the next<br/>channel while the cart is fresh"):::sms --> E6(("<b>End</b>"))
+    Q9 -- yes --> F5("<b>Our app</b><br/>sends this step on the next<br/>channel while the cart is fresh"):::sms --> E6(["<b>→ B2</b><br/>next channel"])
     Q9 -- no --> R2("<b>Queue</b><br/>tries again in 2 min") --> E7(("<b>End</b>"))
 
     Q10{"Has the lead ever<br/>written to line X?"}
     Q10 -- yes --> AI2("<b>AI</b><br/>writes the full message,<br/>checkout link allowed") --> QC
     Q10 -- no --> Q11{"Already 2 iMessages<br/>with no reply?"}
-    Q11 -- yes --> F6("<b>Our app</b><br/>moves the lead to the next<br/>channel, sends with the link"):::sms --> E8(("<b>End</b>"))
+    Q11 -- yes --> F6("<b>Our app</b><br/>moves the lead to the next<br/>channel, sends with the link"):::sms --> E8(["<b>→ B2</b><br/>next channel"])
     Q11 -- no --> AI1("<b>AI</b><br/>writes a short question: names<br/>the brand, says it's an assistant,<br/>no link, max 300 characters") --> QC
 
     QC{"Passes our<br/>content check?"}
@@ -74,12 +74,12 @@ flowchart TD
     Q13 -- no --> Q14{"Temporary error?<br/>rate limit, 5xx, timeout"}
     Q14 -- yes --> Q15{"Tried 3<br/>times already?"}
     Q15 -- no --> R4("<b>Queue</b><br/>retries after 10 s, 30 s, 60 s, logs") --> Q12
-    Q15 -- yes --> F7("<b>Our app</b><br/>sends on the next channel,<br/>logs, alerts"):::sms --> E10(("<b>End</b>"))
+    Q15 -- yes --> F7("<b>Our app</b><br/>sends on the next channel,<br/>logs, alerts"):::sms --> E10(["<b>→ B2</b><br/>next channel"])
     Q14 -- no --> Q16{"Declined because<br/>of the text?"}
     Q16 -- yes --> Q17{"Already<br/>rewritten once?"}
     Q17 -- no --> AI3("<b>AI</b><br/>rewrites without the blocked part") --> Q12
-    Q17 -- yes --> F8("<b>Our app</b><br/>sends on the next channel,<br/>logs why"):::sms --> E11(("<b>End</b>"))
-    Q16 -- no --> F9("<b>Our app</b><br/>line limit hit or line blocked:<br/>marks the line, logs,<br/>health check runs,<br/>sends this step on<br/>the next channel"):::sms --> E12(("<b>End</b>"))
+    Q17 -- yes --> F8("<b>Our app</b><br/>sends on the next channel,<br/>logs why"):::sms --> E11(["<b>→ B2</b><br/>next channel"])
+    Q16 -- no --> F9("<b>Our app</b><br/>line limit hit or line blocked:<br/>marks the line, logs,<br/>health check runs,<br/>sends this step on<br/>the next channel"):::sms --> E12(["<b>→ B2</b><br/>next channel"])
 
     classDef start fill:#4f46e5,stroke:#4f46e5,color:#ffffff
     classDef finish fill:#1f2328,stroke:#1f2328,color:#ffffff
@@ -87,17 +87,61 @@ flowchart TD
     classDef decision fill:#ffffff,stroke:#c4c8d0,color:#1f2328
     classDef out fill:#e3f5e1,stroke:#2e7d32,stroke-width:2px,color:#1f2328
     classDef sms fill:#e2ecfb,stroke:#2563eb,stroke-width:2px,color:#1f2328
+    classDef jump fill:#e2ecfb,stroke:#2563eb,stroke-width:2px,stroke-dasharray:5 4,color:#1f2328
     class S start
-    class E0,E1,E2,E3,E15,E4,E5,E6,E7,E8,E13,E14,E9,E10,E11,E12 finish
+    class E0,E4,E7,E13,E14,E9 finish
+    class E1,E2,E3,E15,E5,E6,E8,E10,E11,E12 jump
     class Q0,Q1,Q2,Q3,Q4,QG,QL,Q5,Q6,Q7,Q8,Q9,Q10,Q11,QC,QC2,Q12,QS,Q13,Q14,Q15,Q16,Q17 decision
-    class A1,F1,F2,L1,L2,R1,X1,X2,R2,AI2,AI1,AI4,F10,R3,X3,SEND,OK2,PH,R4,AI3 action
+    class A1,L1,L2,R1,X1,X2,R2,AI2,AI1,AI4,F10,R3,X3,SEND,OK2,PH,R4,AI3 action
     linkStyle 2,6,9,13,16,19,22,24,25,28,31,34,38,41,48,50,53,56,58,63,66,69,72 color:#15803d,stroke:#6b7280
     linkStyle 3,4,7,10,14,17,20,23,26,30,33,36,40,43,45,46,51,54,62,64,68,70,74 color:#b91c1c,stroke:#6b7280
 ```
 
-🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 the step moves to the next channel
+🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 the step moves to the next channel · dashed 🟦 → B2: continues in diagram B2
 
 If the diagram doesn't render: [diagram-b.png](diagram-b.png)
+
+---
+
+## B2. Next channel: where a step goes when iMessage can't take it
+
+Every blue box in B and C ends here. The step doesn't wait for the campaign schedule, and the AI writes it again for the new channel.
+
+```mermaid
+%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica, Arial, sans-serif", "primaryColor": "#ffffff", "primaryBorderColor": "#d0d4db", "primaryTextColor": "#1f2328", "lineColor": "#6b7280", "edgeLabelBackground": "#ffffff"}, "themeCSS": "foreignObject { overflow: visible; } .nodeLabel { white-space: nowrap; }", "flowchart": {"curve": "basis", "nodeSpacing": 40, "rankSpacing": 45, "padding": 18}}}%%
+flowchart TD
+    S(("<b>A blue box<br/>in B or C</b>")) --> Q0("<b>Queue</b><br/>new priority job, due now,<br/>iMessage crossed out for this step")
+    Q0 --> C1{"Another channel the campaign<br/>has on, that the lead can get?<br/>consent, not opted out.<br/>SMS first, then email or a call"}
+    C1 -- no --> N1("<b>Our app</b><br/>no channel left:<br/>drops the step, logs why") --> E1(("<b>End</b>"))
+    C1 -- yes --> AI1("<b>AI</b><br/>writes the step again for that channel.<br/>SMS: short, with the link and how to stop.<br/>Mid-chat: says it's the same store,<br/>on a new number")
+    AI1 --> C2{"Passes our<br/>content check?"}
+    C2 -- no --> N2("<b>Our app</b><br/>does not send, logs,<br/>alerts the team") --> E2(("<b>End</b>"))
+    C2 -- yes --> C3{"Inside the lead's legal hours,<br/>and campaign hours unless<br/>the lead is mid-chat?"}
+    C3 -- no --> N3("<b>Queue</b><br/>holds it for the next window,<br/>still a priority job") --> E3(("<b>End</b>"))
+    C3 -- yes --> C4{"Step still wanted?<br/>no purchase, reply<br/>or opt-out meanwhile"}
+    C4 -- no --> N4("<b>Queue</b><br/>drops it, logs why") --> E4(("<b>End</b>"))
+    C4 -- yes --> SEND("<b>Our app → that channel's provider</b><br/>SMS: our Twilio account")
+    SEND --> C5{"Provider<br/>accepted it?"}
+    C5 -- yes --> OUT("<b>Provider</b><br/>the SMS leaves the store's SMS number.<br/>Email or call: the store's usual sender"):::sms
+    OUT --> PH("<b>Lead's phone</b><br/>green bubble from the<br/>store's SMS number") --> E5(("<b>End</b>"))
+    C5 -- no --> N5("<b>Queue</b><br/>that channel's own retries.<br/>Still failing: crosses it out too") --> C1
+
+    classDef start fill:#4f46e5,stroke:#4f46e5,color:#ffffff
+    classDef finish fill:#1f2328,stroke:#1f2328,color:#ffffff
+    classDef action fill:#ffffff,stroke:#d0d4db,color:#1f2328
+    classDef decision fill:#ffffff,stroke:#c4c8d0,color:#1f2328
+    classDef sms fill:#e2ecfb,stroke:#2563eb,stroke-width:2px,color:#1f2328
+    class S start
+    class E1,E2,E3,E4,E5 finish
+    class C1,C2,C3,C4,C5 decision
+    class Q0,N1,AI1,N2,N3,N4,SEND,PH,N5 action
+    linkStyle 4,8,11,14,16 color:#15803d,stroke:#6b7280
+    linkStyle 2,6,9,12,19 color:#b91c1c,stroke:#6b7280
+```
+
+🟣 start · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟦 an SMS leaves the store's SMS number
+
+If the diagram doesn't render: [diagram-b2.png](diagram-b2.png)
 
 ---
 
@@ -120,10 +164,10 @@ flowchart TD
     Q4a -- no --> Q4{"Status:<br/>delivered?"}
     Q4 -- yes --> D1("<b>Queue</b><br/>marks message delivered,<br/>updates line stats") --> E3(("<b>End</b>"))
     Q4 -- no --> Q5{"Not on iMessage, or<br/>no receipt after 15 min?"}
-    Q5 -- yes --> D2("<b>Queue</b><br/>sends this step again on the<br/>next channel now, marks the lead<br/>not on iMessage, clears the cache"):::sms --> E4(("<b>End</b>"))
+    Q5 -- yes --> D2("<b>Queue</b><br/>sends this step again on the<br/>next channel now, marks the lead<br/>not on iMessage, clears the cache"):::sms --> E4(["<b>→ B2</b><br/>next channel"])
     Q5 -- no --> D3("<b>Queue</b><br/>marks message failed,<br/>counts against the line, logs") --> Q6{"Line now<br/>in red?"}
     Q6 -- yes --> D4("<b>Our app</b><br/>stops new leads on the line,<br/>moves its chats to the next channel,<br/>alerts Slack and the store") --> E5(("<b>End</b>"))
-    Q6 -- no --> D5("<b>Queue</b><br/>sends the step on<br/>the next channel"):::sms --> E6(("<b>End</b>"))
+    Q6 -- no --> D5("<b>Queue</b><br/>sends the step on<br/>the next channel"):::sms --> E6(["<b>→ B2</b><br/>next channel"])
 
     Q3 -- yes --> Q7{"Number matches<br/>a lead of this<br/>line's store?"}
     Q7 -- no --> R1("<b>Our app</b><br/>saves to the inbox,<br/>tells the store") --> E7(("<b>End</b>"))
@@ -141,7 +185,7 @@ flowchart TD
     Q11 -- no --> QC{"Answer passes our<br/>content check?"}
     QC -- no --> R4
     QC -- yes --> Q12{"Line X still<br/>healthy?"}
-    Q12 -- no --> R6("<b>Our app</b><br/>sends the answer on<br/>the next channel"):::sms --> E10(("<b>End</b>"))
+    Q12 -- no --> R6("<b>Our app</b><br/>sends the answer on<br/>the next channel"):::sms --> E10(["<b>→ B2</b><br/>next channel"])
     Q12 -- yes --> QL{"Inside the lead's<br/>state legal hours?"}
     QL -- no --> R9("<b>Queue</b><br/>holds the answer<br/>until the hours open") --> R7
     QL -- yes --> R7("<b>Queue</b><br/>priority send job on line X,<br/>campaign hours skipped:<br/>lead is active")
@@ -156,14 +200,16 @@ flowchart TD
     classDef decision fill:#ffffff,stroke:#c4c8d0,color:#1f2328
     classDef out fill:#e3f5e1,stroke:#2e7d32,stroke-width:2px,color:#1f2328
     classDef sms fill:#e2ecfb,stroke:#2563eb,stroke-width:2px,color:#1f2328
+    classDef jump fill:#e2ecfb,stroke:#2563eb,stroke-width:2px,stroke-dasharray:5 4,color:#1f2328
     class S,S2 start
-    class E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12 finish
+    class E1,E2,E3,E5,E7,E8,E9,E11,E12 finish
+    class E4,E6,E10 jump
     class Q1,Q2,Q3,Q4a,Q4,Q5,Q6,Q7,Q8,Q9,Q10,Q11,QC,Q12,QL,Q13 decision
     class P1,CU,X1,X2,A1,D1,D3,D4,R1,R2,R3,R4,TY,R5,AI,R9,R7,PH,R8 action
     linkStyle 6,7,12,14,17,21,25,28,29,34,39,42,45,48,51,53 color:#15803d,stroke:#6b7280
     linkStyle 4,9,11,13,16,19,23,26,32,36,40,43,44,46,49,56 color:#b91c1c,stroke:#6b7280
 ```
 
-🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 the step moves to the next channel
+🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 the step moves to the next channel · dashed 🟦 → B2: continues in diagram B2
 
 If the diagram doesn't render: [diagram-c.png](diagram-c.png)
