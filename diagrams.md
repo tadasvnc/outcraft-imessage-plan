@@ -10,14 +10,14 @@ Back to the plan: [README.md](README.md)
 - 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 today's path: the step runs as if iMessage were off, the campaign's way, never from line X
 - **Today's path** (🟦 blue boxes): what Outcraft does today, without iMessage. The step goes back to the campaign and runs as if iMessage were off, with the campaign's own channel, settings, frequency caps and checks. Often that's SMS from the store's own number, sometimes a call. The campaign decides, not B. The message is already written, so it goes at once, with no AI call.
   - **Our app → today's path:** iMessage was possible, but a send-time check or the provider said no. Our app hands the step back at once and logs why.
-  - **AI → today's path** (diagram C): line X fails mid-chat, so the AI rewrites its answer for the campaign's other text channel.
+  - **AI → today's path** (diagram C): iMessage is off, line X fails mid-chat, or the answer still fails after retries. C has no answer written ahead, so the AI rewrites it for the campaign's other text channel.
 - **Who does it:** our app, the scheduler, the queue, the AI, the provider, or the lead's phone.
 - **Line X** is the store's iMessage line: one per store in v1, like its one SMS number. Every iMessage to the store's leads comes from it.
 - **iMessage switches:** one for everyone on Outcraft (our team, or the circuit breaker when the provider is down), one per store (our admins), one per campaign. All three must be on.
 - **Which steps:** iMessage is a fifth channel. A text step is an SMS step or an iMessage step. A campaign can add iMessage steps, each with a fallback the campaign sets (SMS or a call). For a lead on iMessage, SMS steps also go from line X. One number per lead: after a hand-back, the lead's next steps run as today.
 - **Today's message:** what the campaign sends without iMessage. For an SMS step, the AI writes it as today. For an iMessage step, it's the message for its fallback (nothing to write for a call). The AI also writes an iMessage version.
 - **What B leaves to today's system:** sending hours and state legal hours (the scheduler fires the step inside them), opt-out and frequency caps (today's checks). B adds only the iMessage on-switch and line X's limits.
-- **Legal hours in C:** live replies skip the scheduler, so C checks legal hours itself, with the same rule.
+- **Legal hours in C:** live replies skip the scheduler, so C checks legal hours itself, with the same rule. It checks before the AI writes, so no answer waits for hours and goes out stale.
 - **Checks in two places:** the full iMessage check runs before writing. At send time, today's checks and the on-switch run again, so nothing stale goes out. If the check, or the lookup, fails, the lead stays on today's path.
 - **When iMessage fails:** if we know it didn't arrive (refused, failed, not on iMessage), today's message goes at once, the campaign's way. If we don't know (no receipt in 15 min), we don't resend, so the lead never gets both. The lead is marked, and the next steps run as today.
 - **The call after a text:** their default sequence calls about 3 minutes after a text step. That stays. If the lead replies first, the reply cancels scheduled steps, including that call (diagram C).
@@ -44,13 +44,13 @@ flowchart TD
     QI -- no --> SMS1("<b>Our app → today's path</b><br/>hands the step back to the<br/>campaign: it runs as if<br/>iMessage were off"):::sms --> E2(("<b>End</b>"))
     QI -- yes --> Q7{"Line X<br/>healthy?"}
     Q7 -- no --> SMS2("<b>Our app → today's path</b><br/>hands the step back now,<br/>logs why"):::sms --> E4(("<b>End</b>"))
-    Q7 -- yes --> Q6{"Chat with this lead<br/>already on line X?"}
+    Q7 -- yes --> Q6{"Already messaged<br/>this lead from line X?"}
     Q6 -- yes --> SEND("<b>Our app → Provider API</b><br/>sends the iMessage version<br/>from line X")
     Q6 -- no --> Q8{"New-chat slot free on line X?<br/>today's cap 10 → 25 → 50<br/>in warm-up, 15 an hour"}
     Q8 -- yes --> SEND
     Q8 -- no --> SMS3("<b>Our app → today's path</b><br/>hands the step back now:<br/>no free slot on line X"):::sms --> E5(("<b>End</b>"))
     SEND --> Q13{"Provider<br/>accepted it?"}
-    Q13 -- yes --> OK2("<b>Our app</b><br/>saves the provider id.<br/>The lead now has a chat<br/>on line X")
+    Q13 -- yes --> OK2("<b>Our app</b><br/>saves the provider id,<br/>marks the lead as messaged<br/>from line X")
     OK2 --> OUT("<b>Provider</b><br/>the iMessage leaves line X"):::out
     OUT --> PH("<b>Lead's phone</b><br/>blue bubble arrives from line X.<br/>Delivery status comes back<br/>by webhook (diagram C)")
     PH --> E6(("<b>End</b>"))
@@ -111,25 +111,25 @@ flowchart TD
     Q7 -- yes --> Q8{"Asks to stop?<br/>STOP, unsubscribe,<br/>'stop texting me'..."}
     Q8 -- yes --> R2("<b>Our app</b><br/>opts the lead out on all<br/>of this store's channels,<br/>cancels steps") --> OUT2("<b>Provider</b><br/>one confirmation leaves line X"):::out
     OUT2 --> E8(("<b>End</b>"))
-    Q8 -- no --> R3("<b>Our app</b><br/>cancels scheduled steps,<br/>marks lead 'in chat',<br/>no-link rule lifts")
+    Q8 -- no --> R3("<b>Our app</b><br/>cancels scheduled steps,<br/>marks the lead as replied,<br/>no-link rule lifts")
     R3 --> Q9{"A person is handling<br/>this lead, or 30 AI<br/>replies reached?"}
     Q9 -- yes --> R4("<b>Our app</b><br/>notifies the person,<br/>AI stays quiet") --> E9(("<b>End</b>"))
-    Q9 -- no --> TY("<b>Provider</b><br/>shows typing dots<br/>on the lead's phone") --> R5("<b>Queue</b><br/>waits 15 seconds") --> Q10{"More messages<br/>came in meanwhile?"}
+    Q9 -- no --> QL{"Inside the lead's<br/>state legal hours?<br/>same rule as the scheduler"}
+    QL -- no --> R9("<b>Queue</b><br/>waits until the hours open.<br/>The AI writes then,<br/>with the whole chat") --> TY
+    QL -- yes --> TY("<b>Provider</b><br/>shows typing dots<br/>on the lead's phone") --> R5("<b>Queue</b><br/>waits 15 seconds") --> Q10{"More messages<br/>came in meanwhile?"}
     Q10 -- yes --> R5
     Q10 -- no --> AI("<b>AI</b><br/>reads the whole chat, writes<br/>one answer, picks the next step")
     AI --> Q11{"AI asks for<br/>a person?"}
     Q11 -- yes --> R4
     Q11 -- no --> QC{"Answer passes our<br/>content check?"}
     QC -- no --> R4
-    QC -- yes --> Q12{"Line X still<br/>healthy?"}
+    QC -- yes --> Q12{"iMessage still on,<br/>and line X healthy?"}
     Q12 -- no --> R6("<b>AI → today's path</b><br/>rewrites the answer for the<br/>campaign's other text channel,<br/>says it's the same store"):::sms --> E10(("<b>End</b>"))
-    Q12 -- yes --> QL{"Inside the lead's<br/>state legal hours?<br/>same rule as the scheduler"}
-    QL -- no --> R9("<b>Queue</b><br/>holds the answer<br/>until the hours open") --> R7
-    QL -- yes --> R7("<b>Queue</b><br/>priority send job on line X,<br/>campaign hours skipped:<br/>lead is active")
-    R7 --> Q13{"Provider<br/>accepted it?"}
+    Q12 -- yes --> R7("<b>Queue</b><br/>priority send job on line X,<br/>campaign hours skipped:<br/>lead is active")
+    R7 --> Q13{"Provider accepted it?<br/>temporary errors retried<br/>after 10 s, 30 s, 60 s,<br/>like diagram B"}
+    Q13 -- no --> R6
     Q13 -- yes --> OUT("<b>Provider</b><br/>the answer leaves line X,<br/>the number the lead wrote to"):::out
     OUT --> PH("<b>Lead's phone</b><br/>answer arrives in<br/>the same thread") --> E11(("<b>End</b>"))
-    Q13 -- no --> R8("<b>Queue</b><br/>same retry and fallback rules<br/>as diagram B") --> E12(("<b>End</b>"))
 
     classDef start fill:#4f46e5,stroke:#4f46e5,color:#ffffff
     classDef finish fill:#1f2328,stroke:#1f2328,color:#ffffff
@@ -138,11 +138,11 @@ flowchart TD
     classDef out fill:#e3f5e1,stroke:#2e7d32,stroke-width:2px,color:#1f2328
     classDef sms fill:#e2ecfb,stroke:#2563eb,stroke-width:2px,color:#1f2328
     class S,S2 start
-    class E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13 finish
-    class Q1,Q2,Q3,Q4a,Q4,Q5,QR,Q6,Q7,Q8,Q9,Q10,Q11,QC,Q12,QL,Q13 decision
-    class P1,CU,X1,X2,A1,D1,DR,D3,D4,R1,R2,R3,R4,TY,R5,AI,R9,R7,PH,R8 action
-    linkStyle 6,7,12,14,17,20,24,28,31,32,37,42,45,48,51,54,56 color:#15803d,stroke:#6b7280
-    linkStyle 4,9,11,13,16,19,22,26,29,35,39,43,46,47,49,52,59 color:#b91c1c,stroke:#6b7280
+    class E1,E2,E3,E4,E13,E5,E6,E7,E8,E9,E10,E11 finish
+    class Q1,Q2,Q3,Q4a,Q4,Q5,QR,Q6,Q7,Q8,Q9,QL,Q10,Q11,QC,Q12,Q13 decision
+    class P1,CU,X1,X2,A1,D1,DR,D3,D4,R1,R2,R3,R4,R9,TY,R5,AI,R7,PH action
+    linkStyle 6,7,12,14,17,20,24,28,31,32,37,42,45,48,51,54,57 color:#15803d,stroke:#6b7280
+    linkStyle 4,9,11,13,16,19,22,26,29,35,39,40,46,49,50,52,56 color:#b91c1c,stroke:#6b7280
 ```
 
 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 today's path: the step runs as if iMessage were off, the campaign's way, never from line X
