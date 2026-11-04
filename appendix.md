@@ -169,7 +169,8 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 
 **Step 0: is it worth it? (weeks 1–3, about $300, no build)**
 - **Count the eligible shoppers** (a few days): carts with consent and a US/CA number, times the iPhone share from a lookup on about 500 numbers.
-- **Manual test:** one store, one Blooio line, which goes on into the pilot. Half the iPhone carts get iMessage, half get the campaign as today. A person answers, with AI drafts. Dashboard sends skip our consent, Do Not Call and hours checks, so someone checks those by hand.
+- **One-line test:** one store, one Blooio line, which goes on into the pilot. A throwaway script (about a day of work) takes the store's abandoned-cart event, checks consent, a US/CA number and 9:00–17:00 local time, asks Blooio whether the number is on iMessage, and sends one fixed message to half the iPhone carts. The other half get the campaign as today. Replies go to a Slack channel, and a support person answers in Blooio's dashboard with AI drafts, about 30 minutes a day. The script is deleted after step 0.
+- **Before the first message:** Blooio goes on Outcraft's sub-processor list, 10 days before any shopper data reaches it (Outcraft's DPA, clause 7.4.3).
 - **At the same time:** provider contract, data agreement (DPA), legal check on state rules.
 - **Go on if:** a store has at least ~30 eligible shoppers a day, replies are at least 2× the other half, and the line isn't flagged.
 - **If cold messages get the line flagged:** plan B, leads write to us first (below).
