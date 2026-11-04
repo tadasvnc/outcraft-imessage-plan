@@ -7,8 +7,8 @@ Back to the plan: [README.md](README.md)
 **Where this sits in today's flow:** lead joins a campaign → before each text step, the **iMessage check** → AI writes today's message as usual, plus an iMessage version if the lead can get it → scheduler: step is due → **B:** send-time checks, then iMessage from line X, or the step goes back to the campaign → **C:** statuses and replies → AI answers. Leads who can't get iMessage keep today's path.
 
 **How to read:**
-- 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 the step goes back to the campaign: today's path
-- **Who does it:** our app, the queue, the AI, the provider, or the lead's phone.
+- 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 the step goes back to the campaign: it leaves from the store's own number, as today
+- **Who does it:** our app, the scheduler, the queue, the AI, the provider, or the lead's phone.
 - **Line X** is the store's iMessage line this lead is pinned to. Every iMessage to the lead comes from it.
 - **Which steps:** iMessage is a fifth channel. When it's on, a lead on iMessage gets every text step, iMessage or SMS, from line X. One number per lead.
 - **Today's message** (blue boxes): the AI writes the step as it does today, plus an iMessage version. When iMessage can't be used, the step goes back to the campaign and runs as if iMessage were off, with the campaign's own channel, settings, frequency caps and checks. Often that's SMS from the store's number, but it can be a call. The campaign decides, not B.
@@ -26,7 +26,7 @@ Back to the plan: [README.md](README.md)
 flowchart TD
     S(("<b>Next step is<br/>a text step</b>")) --> Q1{"iMessage check: on for the store<br/>and the campaign, US/CA number,<br/>texting consent, not opted out,<br/>passes Do Not Call?<br/>pilot: not FL, MD or OK"}
     Q1 -- no --> W1("<b>AI</b><br/>writes today's message only:<br/>today's path, unchanged")
-    W1 --> SMS0("<b>Today's path</b><br/>the campaign sends it when due,<br/>as its settings say"):::sms --> E1(("<b>End</b>"))
+    W1 --> SMS0("<b>Scheduler → today's path</b><br/>the campaign sends it when due,<br/>from the store's own number"):::sms --> E1(("<b>End</b>"))
     Q1 -- yes --> Q2{"iMessage result cached<br/>in the last 30 days?"}
     Q2 -- no --> L1("<b>Provider</b><br/>lookup: is this number<br/>on iMessage?") --> Q3{"Lookup<br/>answered?"}
     Q3 -- no --> W1
@@ -94,7 +94,7 @@ flowchart TD
     linkStyle 1,5,7,11,13,17,19,21,22,29,30,33,36,39,42,46,49,52,54,62,64,68 color:#b91c1c,stroke:#6b7280
 ```
 
-🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 the step goes back to the campaign: today's path
+🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 the step goes back to the campaign: it leaves from the store's own number, as today
 
 If the diagram doesn't render: [diagram-b.png](diagram-b.png)
 
@@ -165,6 +165,6 @@ flowchart TD
     linkStyle 4,9,11,13,16,19,22,26,29,35,39,43,46,47,49,52,59 color:#b91c1c,stroke:#6b7280
 ```
 
-🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 the step goes back to the campaign: today's path
+🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 the step goes back to the campaign: it leaves from the store's own number, as today
 
 If the diagram doesn't render: [diagram-c.png](diagram-c.png)
