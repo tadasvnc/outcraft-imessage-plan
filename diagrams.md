@@ -19,7 +19,7 @@ Back to the plan: [README.md](README.md)
 - **What B leaves to today's system:** sending hours, state legal hours and the frequency cap (the scheduler fires the step inside them); reply, purchase and opt-out (the campaign's shared check, the same one SMS uses, run again at send time). B adds only the iMessage on-switch and line X's limits.
 - **Legal hours in C:** live replies skip the scheduler, so C checks legal hours itself, with the same rule. It checks before the AI writes, so no answer waits for hours and goes out stale.
 - **Checks in two places:** the full iMessage check runs before writing. At send time, the campaign's shared check and the on-switch run again, so nothing stale goes out. If the check, or the lookup, fails, the lead stays on today's path.
-- **When iMessage fails:** if we know it didn't arrive (refused, failed, not on iMessage), today's message goes at once, the campaign's way. If we don't know (no receipt in 15 min), we don't resend, so the lead never gets both. The lead is marked, and the next steps run as today.
+- **When iMessage fails:** if we know it didn't arrive (refused, failed, not on iMessage), today's message goes at once, the campaign's way. If we don't know (no delivery status in 15 min), we don't resend, so the lead never gets both. The lead is marked, and the next steps run as today.
 - **The call after a text:** their default sequence calls about 3 minutes after a text step. That stays. If the lead replies first, the reply cancels scheduled steps, including that call (diagram C).
 - **Logging:** every refusal, retry, fallback and drop is logged with its reason and the provider's error key.
 
@@ -85,24 +85,24 @@ If the diagram doesn't render: [diagram-b.png](diagram-b.png)
 ```mermaid
 %%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica, Arial, sans-serif", "primaryColor": "#ffffff", "primaryBorderColor": "#d0d4db", "primaryTextColor": "#1f2328", "lineColor": "#6b7280", "edgeLabelBackground": "#ffffff"}, "themeCSS": "foreignObject { overflow: visible; } .nodeLabel { white-space: nowrap; }", "flowchart": {"curve": "basis", "nodeSpacing": 40, "rankSpacing": 45, "padding": 18}}}%%
 flowchart TD
-    S(("<b>Lead's phone<br/>writes, or a<br/>receipt arrives</b>")) --> P1("<b>Provider</b><br/>receives it on line X,<br/>sends a webhook to our app")
-    S2(("<b>Every 5 min:<br/>catch-up job</b>")) --> CU("<b>Our app</b><br/>pulls missed events and messages<br/>with no receipt after 15 min") --> Q2
+    S(("<b>Lead's phone<br/>writes, or a<br/>status arrives</b>")) --> P1("<b>Provider</b><br/>receives it on line X,<br/>sends a webhook to our app")
+    S2(("<b>Every 5 min:<br/>catch-up job</b>")) --> CU("<b>Our app</b><br/>pulls missed events, and finds messages<br/>with no delivery status after 15 min") --> QR{"Message with no<br/>delivery status<br/>after 15 min?"}
+    QR -- yes --> DR("<b>Queue</b><br/>no resend: it may still arrive.<br/>Marks the lead not on iMessage,<br/>so the next steps run as today") --> E13(("<b>End</b>"))
+    QR -- no --> Q2
     P1 --> Q1{"Signature<br/>valid?"}
-    Q1 -- no --> X1("<b>Our app</b><br/>rejects it, logs") --> E1(("<b>End</b>"))
     Q1 -- yes --> Q2{"Seen this<br/>event id before?"}
+    Q1 -- no --> X1("<b>Our app</b><br/>rejects it, logs") --> E1(("<b>End</b>"))
     Q2 -- yes --> X2("<b>Our app</b><br/>answers OK, ignores it") --> E2(("<b>End</b>"))
     Q2 -- no --> A1("<b>Our app</b><br/>saves the event, answers OK fast,<br/>puts it on the queue")
     A1 --> Q3{"Is it a reply<br/>from a lead?"}
 
     Q3 -- no --> Q4a{"Provider says<br/>line X is blocked?"}
     Q4a -- yes --> D4
-    Q4a -- no --> Q4{"Status:<br/>delivered?"}
-    Q4 -- yes --> D1("<b>Queue</b><br/>marks message delivered,<br/>updates line stats") --> E3(("<b>End</b>"))
+    Q4a -- no --> Q4{"Status: sent,<br/>delivered or read?"}
+    Q4 -- yes --> D1("<b>Queue</b><br/>saves the status,<br/>updates line stats") --> E3(("<b>End</b>"))
     Q4 -- no --> Q5{"Provider says: not<br/>on iMessage?"}
     Q5 -- yes --> D2("<b>Our app → today's path</b><br/>hands the step back now.<br/>Marks the lead not on iMessage"):::sms --> E4(("<b>End</b>"))
-    Q5 -- no --> QR{"No receipt<br/>after 15 min?"}
-    QR -- yes --> DR("<b>Queue</b><br/>no resend: it may still arrive.<br/>Marks the lead not on iMessage,<br/>so the next steps run as today") --> E13(("<b>End</b>"))
-    QR -- no --> D3("<b>Queue</b><br/>marks message failed,<br/>counts against the line, logs") --> Q6{"Line now<br/>in red?"}
+    Q5 -- no --> D3("<b>Queue</b><br/>the message failed: marks it,<br/>counts against the line, logs") --> Q6{"Line now<br/>in red?"}
     Q6 -- yes --> D4("<b>Our app</b><br/>stops new leads on the line,<br/>moves its chats to today's path,<br/>alerts Slack and the store") --> E5(("<b>End</b>"))
     Q6 -- no --> D5("<b>Our app → today's path</b><br/>hands the step back now"):::sms --> E6(("<b>End</b>"))
 
@@ -138,11 +138,11 @@ flowchart TD
     classDef out fill:#e3f5e1,stroke:#2e7d32,stroke-width:2px,color:#1f2328
     classDef sms fill:#e2ecfb,stroke:#2563eb,stroke-width:2px,color:#1f2328
     class S,S2 start
-    class E1,E2,E3,E4,E13,E5,E6,E7,E8,E9,E10,E11 finish
-    class Q1,Q2,Q3,Q4a,Q4,Q5,QR,Q6,Q7,Q8,Q9,QL,Q10,Q11,QC,Q12,Q13 decision
-    class P1,CU,X1,X2,A1,D1,DR,D3,D4,R1,R2,R3,R4,R9,TY,R5,AI,R7,PH action
-    linkStyle 6,7,12,14,17,20,24,28,31,32,37,42,45,48,51,54,57 color:#15803d,stroke:#6b7280
-    linkStyle 4,9,11,13,16,19,22,26,29,35,39,40,46,49,50,52,56 color:#b91c1c,stroke:#6b7280
+    class E13,E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11 finish
+    class QR,Q1,Q2,Q3,Q4a,Q4,Q5,Q6,Q7,Q8,Q9,QL,Q10,Q11,QC,Q12,Q13 decision
+    class P1,CU,DR,X1,X2,A1,D1,D3,D4,R1,R2,R3,R4,R9,TY,R5,AI,R7,PH action
+    linkStyle 3,7,10,15,17,20,24,28,31,32,37,42,45,48,51,54,57 color:#15803d,stroke:#6b7280
+    linkStyle 5,8,12,14,16,19,22,26,29,35,39,40,46,49,50,52,56 color:#b91c1c,stroke:#6b7280
 ```
 
 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 today's path: the step runs as if iMessage were off, the campaign's way, never from line X
