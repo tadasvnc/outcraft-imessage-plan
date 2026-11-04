@@ -10,9 +10,10 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 ## 1. Provider: which one, and why
 
 - **Today:** no provider yet.
-- **Compared** on price, limits, health signals and security: Blooio, Linq, Sendblue (2026 breach, sells its own cart recovery), Photon, own Macs.
+- **Compared** on price, limits, health signals and security: Blooio, Linq, Sendblue, Photon, own Macs.
 - **Suggestion: Blooio**, with a data agreement and only the data a message needs. Plan B: Linq.
 - **Why:** public prices ($195 a line at 6+), live in days, hard limits that catch our mistakes.
+- **Not Sendblue:** it sells its own iMessage cart recovery to Shopify stores, our market, so it would see our customers' shoppers and volumes. It also had a data breach in July 2026.
 
 ## 2. Risks: what breaks at volume, and what we do
 

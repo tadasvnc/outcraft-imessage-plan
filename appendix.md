@@ -11,15 +11,15 @@ Back to the plan: [README.md](README.md) · [Diagrams](diagrams.md)
 | Outbound price | On request (reported about $250/line) | On request (the $100 plan is inbound only) | $289/line, $195 at 6+ lines | $250/line |
 | New chats per line | About 50 in 24 hours, then the line is marked "at risk" (a warning, not a block) | 50 a day, 15 an hour, max 150 in a row without a reply. An error code for each rule. | No fixed number. Over 10 a day with under 40% replies → slowed, then paused. An error code for each rule. | Up to 50 a day |
 | Line health in the API | Healthy / at risk / critical, a webhook on change, automatic move off a flagged line | A `line_blocked` webhook | A health endpoint and a safety-state webhook | A dashboard. API unclear. |
-| Security | Says SOC 2 Type II (auditor not named). 99.95% uptime in the contract. | SOC 2, HIPAA. **Data breach in July 2026:** message content and phone numbers accessed for some customers, investigation ongoing. | Not SOC 2 certified, by its own blog | No claim on its own pages |
+| Security | Says SOC 2 Type II (auditor not named). 99.95% uptime in the contract. | SOC 2, HIPAA. **Data breach in July 2026:** message content and phone numbers accessed for some customers, investigation ongoing. | No SOC 2 report yet, by its own blog | No claim on its own pages |
 | Company | Raised about $20M (Feb 2026), 1,000+ teams, used by Lindy. Sells the API since about 2025. | The oldest, 5+ years | Founded 2024 | Small. Open-source core. |
 | Conflict with us | None found | Sells its own iMessage cart recovery to Shopify brands | None found | None found |
 
 **Pick: Blooio**, from step 0 through the pilot, so the line warmed in step 0 carries into the pilot.
 - **Why:** public prices ($195 a line at 6+, no setup fees), live in days, and hard limits with an error code for each rule, so the provider catches our own mistakes. It falls back to SMS only through our own Twilio, so we leave that off and fall back through our own channels.
-- **Conditions:** a data agreement (DPA) before any shopper data flows, and its SOC 2 finished before we grow beyond the pilot (its trust page says "in progress"). Otherwise we move to Linq; our provider interface keeps that to about a week.
+- **Conditions:** a data agreement (DPA) before any shopper data flows, and only the data a message needs: first name, phone number, cart item. Its SOC 2 is "in progress" by its trust page. That matters only if our customers' security reviews ask for it. Then we move to Linq; our provider interface keeps that to about a week.
 - **Plan B: Linq.** It claims SOC 2 Type II, has a 99.95% uptime contract and automatic failover, but no public price.
-- **Not Sendblue:** the July 2026 breach and its competing cart product. **Not Photon:** its pricing page sells cold outreach while its own guide says not to do it.
+- **Not Sendblue: it competes with us.** It sells its own iMessage cart recovery to Shopify and WooCommerce stores ([Sendblue Recover](https://recover.sendblue.com/)), which is our market. As our provider it would see our customers' shoppers, messages and volumes. A no-data-use clause helps, but it can't be checked. It also had a data breach in July 2026. **Not Photon:** its pricing page sells cold outreach while its own guide says not to do it.
 
 **Also looked at:**
 - **Our own Mac minis:** rejected. The bans and the hardware would be ours, and one AI company (Lindy) was banned within half a day of launch on its own setup.
@@ -34,9 +34,9 @@ Back to the plan: [README.md](README.md) · [Diagrams](diagrams.md)
 - our customers' data is never used for the provider's own products or marketing;
 - whether their automatic SMS fallback can be turned off. It would skip our own SMS consent and STOP handling;
 - a sub-account and a kill switch per customer, so one brand can't get our whole account closed, and in writing that one store's ban can't affect the others;
-- with Blooio, when its SOC 2 will be done, and whether a ban in one store's sub-account slows the others (its `sibling_ban` rule slows every number on an account for 72 hours);
+- with Blooio, when its SOC 2 will be done, in case our customers ask, and whether a ban in one store's sub-account slows the others (its `sibling_ban` rule slows every number on an account for 72 hours);
 - with Linq (plan B), a separate pool per store. If we choose the line ourselves, Linq's automatic failover turns off;
-- the SOC 2 report itself, the auditor's name and the breach history.
+- any SOC 2 report, the auditor's name and the breach history.
 
 **Provider details that shape the build.** From Blooio's docs (our pick):
 - Before a written reply, a chat allows 3 plain-text messages, and links and media are blocked (`conversation_content_restricted`). Our no-link rule and "two unanswered → next channel" stay inside that.
@@ -189,7 +189,7 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 - **Go if**, against the half without iMessage: replies at least 2×, recovery at least 2 points higher, opt-outs no higher, and under 1 blocked line per 10 line-months (section G).
 - **Go →** a paid add-on per line, more stores, later self-serve.
 - **No-go →** plan B (leads write first), or stop and look at RCS.
-- **Before growing beyond the pilot:** Blooio's SOC 2 must be finished, or we move to Linq.
+- **Before growing beyond the pilot:** if our customers' security reviews ask for SOC 2 and Blooio still has none, we move to Linq.
 
 **Other notes:**
 - **The step 0 line is warm**, so the pilot uses it from day one.
