@@ -10,7 +10,7 @@ Back to the plan: [README.md](README.md)
 - 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 today's path: the step runs as if iMessage were off, the campaign's way, never from line X · 🟪 purple border: new for iMessage; grey border: as today, shared with SMS
 - **Today's path** (🟦 blue boxes): what Outcraft does today, without iMessage. The step goes back to the campaign and runs as if iMessage were off, with the campaign's own channel, settings, frequency caps and checks. Often that's SMS from the store's own number, sometimes a call. The campaign decides, not B. The message is already written, so it goes at once, with no AI call.
   - **Our app → today's path:** iMessage was possible, but a send-time check or the provider said no. Our app hands the step back at once and logs why.
-  - **AI → today's path** (diagram C): iMessage is off, line X fails mid-chat, or the answer still fails after retries. C has no answer written ahead, so the AI rewrites it for the campaign's other text channel.
+  - **AI → today's path** (diagram C): iMessage is off, line X fails mid-chat, or a chat answer fails, before or after sending. A chat answer has nothing written ahead, so the AI rewrites it first (it says it's the same store, because the number changes). Then it's handed back the same way as B, and the campaign sends it its own way, with its own checks.
 - **Who does it:** our app, the scheduler, the queue, the AI, the provider, or the lead's phone.
 - **Line X** is the store's iMessage line: one per store in v1, like its one SMS number. Every iMessage to the store's leads comes from it.
 - **iMessage switches:** one for everyone on Outcraft (our team, or the circuit breaker when the provider is down), one per store (our admins), one per campaign. All three must be on.
@@ -129,7 +129,7 @@ flowchart TD
         QC -- yes --> QS{"Still OK to send now?<br/>the campaign's shared check, as for SMS:<br/>not sent yet, and since it was written<br/>the lead hasn't replied, bought or opted out"}
         QS -- no --> XS("<b>Our app</b><br/>drops the answer, logs why.<br/>A newer message gets<br/>its own answer") --> ES(("<b>End</b>"))
         QS -- yes --> Q12{"iMessage still on,<br/>and line X healthy?"}:::new
-        Q12 -- no --> R6("<b>AI → today's path</b><br/>rewrites the answer for the<br/>campaign's other text channel,<br/>says it's the same store"):::sms --> E10(("<b>End</b>"))
+        Q12 -- no --> R6("<b>AI → today's path</b><br/>rewrites the answer,<br/>says it's the same store,<br/>hands it back like B"):::sms --> E10(("<b>End</b>"))
         Q12 -- yes --> R7("<b>Queue</b><br/>priority send job on line X,<br/>campaign hours skipped:<br/>lead is active"):::new
         R7 --> Q13{"Provider accepted it?<br/>temporary errors retried<br/>after 10 s, 30 s, 60 s,<br/>like diagram B"}:::new
         Q13 -- no --> R6
@@ -143,10 +143,12 @@ flowchart TD
         Q4a -- no --> Q4{"Status: sent,<br/>delivered or read?"}
         Q4 -- yes --> D1("<b>Queue</b><br/>saves the status,<br/>updates line stats") --> E3(("<b>End</b>"))
         Q4 -- no --> Q5{"Provider says: not<br/>on iMessage?"}:::new
-        Q5 -- yes --> D2("<b>Our app → today's path</b><br/>hands the step back now.<br/>Marks the lead not on iMessage"):::sms --> E4(("<b>End</b>"))
         Q5 -- no --> D3("<b>Queue</b><br/>the message failed: marks it,<br/>counts against the line, logs"):::new --> Q6{"Line now<br/>in red?"}:::new
+        Q5 -- yes --> DM("<b>Queue</b><br/>marks the lead<br/>not on iMessage"):::new --> QK
         Q6 -- yes --> D4("<b>Our app</b><br/>stops new leads on the line,<br/>moves its chats to today's path,<br/>alerts Slack and the store"):::new --> E5(("<b>End</b>"))
-        Q6 -- no --> D5("<b>Our app → today's path</b><br/>hands the step back now"):::sms --> E6(("<b>End</b>"))
+        Q6 -- no --> QK{"Was it a campaign step?<br/>not a chat answer"}:::new
+        QK -- yes --> D5("<b>Our app → today's path</b><br/>hands the step back now,<br/>like B"):::sms --> E6(("<b>End</b>"))
+        QK -- no --> RA("<b>AI → today's path</b><br/>rewrites the chat answer,<br/>says it's the same store,<br/>hands it back like B"):::sms --> E4(("<b>End</b>"))
     end
 
     Q3 -- yes --> Q7
@@ -171,11 +173,11 @@ flowchart TD
     classDef sms fill:#e2ecfb,stroke:#2563eb,stroke-width:2px,color:#1f2328
     classDef new fill:#ffffff,stroke:#7c3aed,stroke-width:3px,color:#1f2328
     class S,S2 start
-    class E13,E1,E2,E7,E8,E9,ES,E10,E11,E3,E4,E5,E6 finish
+    class E13,E1,E2,E7,E8,E9,ES,E10,E11,E3,E5,E6,E4 finish
     class Q1,Q2,Q3,Q9,QL,Q11,QC,QS,Q4 decision
     class X1,X2,A1,R1,R2,R3,R4,AI,XS,PH,D1 action
-    linkStyle 3,7,10,16,17,22,27,30,33,36,39,42,45,48,50,53,57,61 color:#15803d,stroke:#6b7280
-    linkStyle 5,8,12,14,20,24,25,31,34,35,37,40,44,49,52,55,59,62 color:#b91c1c,stroke:#6b7280
+    linkStyle 3,7,10,16,17,22,27,30,33,36,39,42,45,48,50,55,57,60,64 color:#15803d,stroke:#6b7280
+    linkStyle 5,8,12,14,20,24,25,31,34,35,37,40,44,49,52,53,59,62,65 color:#b91c1c,stroke:#6b7280
 ```
 
 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 today's path: the step runs as if iMessage were off, the campaign's way, never from line X · 🟪 purple border: new for iMessage; grey border: as today, shared with SMS
