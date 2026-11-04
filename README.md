@@ -68,5 +68,5 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 - **How long:** 4 weeks of building for one engineer, 12 weeks from step 0 to the decision.
 - **Blocks us:** the data agreement, legal on consent. **Could slip:** a ban, few replies, an SMS-only send path.
 - **Where we simplified, what waits:** self-serve and billing (needs pilot data), a dashboard (Slack does it), photos, a second provider, countries beyond US/CA.
-- **Go or no-go**, against the half without iMessage: step 0 needs twice the replies, the pilot 2 points more carts recovered (say 12% instead of 10%).
+- **Go or no-go**, against the half without iMessage: step 0 needs twice the replies. The pilot needs 2 more carts recovered per 100 leads, say 12 instead of 10.
 - **Questions:** Is iMessage live? Does SMS consent cover it? Do channels share one send path? Does the AI write when a step is due?
