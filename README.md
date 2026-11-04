@@ -67,7 +67,7 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 
 - **Today:** iMessage isn't built yet (the site lists it: question 1).
 - **Suggestion, step 0 before building (2–3 weeks, ~$300):**
-  - **Count:** carts a day with consent and US/CA number, and iPhone share (lookup on 500).
+  - **Count:** carts a day with consent, and iPhone share (lookup on 500).
   - **Test one line, one store:** a throwaway script sends a fixed iMessage to random iPhone carts, up to the line's cap; the rest get SMS. Support answers replies in Slack (30 min a day).
   - **Result:** 2× replies, no flag → build. Flagged → retry slower, after missed calls. Else stop.
 - **Then v1, in build order:** replies (diagram C): webhooks, AI answers and STOP, live before the first send. Then sending (diagram B): iMessage check, two versions, line limits, alerts.
