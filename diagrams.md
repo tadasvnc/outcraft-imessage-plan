@@ -55,10 +55,10 @@ flowchart TD
     OUT --> PH("<b>Lead's phone</b><br/>blue bubble arrives from line X.<br/>Delivery status comes back<br/>by webhook (diagram C)")
     PH --> E6(("<b>End</b>"))
     Q13 -- no --> Q14{"Temporary error?<br/>rate limit, 5xx, timeout"}
-    Q14 -- yes --> Q15{"Tried 3<br/>times already?"}
-    Q15 -- no --> R4("<b>Queue</b><br/>retries after 10 s, 30 s, 60 s, logs") --> SEND
-    Q15 -- yes --> SMS4("<b>Our app → today's path</b><br/>hands the step back now,<br/>logs, alerts"):::sms --> E7(("<b>End</b>"))
     Q14 -- no --> SMS5("<b>Our app → today's path</b><br/>declined text, line limit or<br/>line blocked: marks the line, logs,<br/>hands the step back now"):::sms --> E8(("<b>End</b>"))
+    Q14 -- yes --> Q15{"Tried 3<br/>times already?"}
+    Q15 -- yes --> SMS4("<b>Our app → today's path</b><br/>hands the step back now,<br/>logs, alerts"):::sms --> E7(("<b>End</b>"))
+    Q15 -- no --> R4("<b>Queue</b><br/>retries after 10 s, 30 s, 60 s:<br/>runs every check again, logs") --> Q0
 
     classDef start fill:#4f46e5,stroke:#4f46e5,color:#ffffff
     classDef finish fill:#1f2328,stroke:#1f2328,color:#ffffff
@@ -67,11 +67,11 @@ flowchart TD
     classDef out fill:#e3f5e1,stroke:#2e7d32,stroke-width:2px,color:#1f2328
     classDef sms fill:#e2ecfb,stroke:#2563eb,stroke-width:2px,color:#1f2328
     class S start
-    class E0,E2,E4,E5,E6,E7,E8 finish
+    class E0,E2,E4,E5,E6,E8,E7 finish
     class Q0,QI,Q7,Q6,Q8,Q13,Q14,Q15 decision
     class A1,X3,SEND,OK2,PH,R4 action
-    linkStyle 4,7,10,11,13,17,22,25 color:#15803d,stroke:#6b7280
-    linkStyle 2,5,8,12,14,21,23,27 color:#b91c1c,stroke:#6b7280
+    linkStyle 4,7,10,11,13,17,24,25 color:#15803d,stroke:#6b7280
+    linkStyle 2,5,8,12,14,21,22,27 color:#b91c1c,stroke:#6b7280
 ```
 
 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 today's path: the step runs as if iMessage were off, the campaign's way, never from line X
