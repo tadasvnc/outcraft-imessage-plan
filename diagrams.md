@@ -19,38 +19,24 @@ Back to the plan: [README.md](README.md)
 
 ---
 
-## B. Sending a message: from writing the step, up to the message leaving a number (or not)
+## B. Sending a message: a step is due, up to the message leaving a number (or not)
+
+**Before B, when the AI writes the step** (not drawn, it's one check):
+1. **iMessage check:** iMessage on for the store and the campaign, a US/CA number, texting consent, not opted out, passes Do Not Call, not in FL, MD or OK during the pilot, the lookup says iMessage (cached 30 days), the iMessage group of the pilot, and fewer than 2 unanswered iMessages. Any error, timeout or unknown means no.
+2. **The AI writes today's message** as usual. If the check passed, it also writes an **iMessage version**: a short question with no link until the lead has written to our line, then the full message.
+3. **Both pass our content check,** or the AI rewrites them once. Still failing: nothing is sent, and the team is alerted.
 
 ```mermaid
 %%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica, Arial, sans-serif", "primaryColor": "#ffffff", "primaryBorderColor": "#d0d4db", "primaryTextColor": "#1f2328", "lineColor": "#6b7280", "edgeLabelBackground": "#ffffff"}, "themeCSS": "foreignObject { overflow: visible; } .nodeLabel { white-space: nowrap; }", "flowchart": {"curve": "basis", "nodeSpacing": 40, "rankSpacing": 45, "padding": 18}}}%%
 flowchart TD
-    S(("<b>Next step is<br/>a text step</b>")) --> Q1{"iMessage check: on for the store<br/>and the campaign, US/CA number,<br/>texting consent, not opted out,<br/>passes Do Not Call?<br/>pilot: not FL, MD or OK"}
-    Q1 -- no --> W1("<b>AI</b><br/>writes today's message only:<br/>today's path, unchanged")
-    W1 --> SMS0("<b>Scheduler → today's path</b><br/>the campaign sends it when due,<br/>from the store's own number"):::sms --> E1(("<b>End</b>"))
-    Q1 -- yes --> Q2{"iMessage result cached<br/>in the last 30 days?"}
-    Q2 -- no --> L1("<b>Provider</b><br/>lookup: is this number<br/>on iMessage?") --> Q3{"Lookup<br/>answered?"}
-    Q3 -- no --> W1
-    Q3 -- yes --> L2("<b>Our app</b><br/>saves the result") --> Q4
-    Q2 -- yes --> Q4{"Lead is on<br/>iMessage?"}
-    Q4 -- no --> W1
-    Q4 -- yes --> QG{"Pilot: in the iMessage group?<br/>picked at random once<br/>per lead, then saved"}
-    QG -- no --> W1
-    QG -- yes --> Q10{"Has the lead ever written<br/>to our iMessage line?"}
-    Q10 -- yes --> AI2("<b>AI</b><br/>writes today's message<br/>and an iMessage version,<br/>link allowed") --> QC
-    Q10 -- no --> Q11{"Already 2 iMessages<br/>with no reply?"}
-    Q11 -- yes --> W1
-    Q11 -- no --> AI1("<b>AI</b><br/>writes today's message and an<br/>iMessage version: a short question,<br/>names the brand, says it's<br/>an assistant, no link") --> QC
-
-    QC{"Both pass our<br/>content check?"}
-    QC -- no --> QC2{"Already<br/>rewritten once?"}
-    QC2 -- no --> AI4("<b>AI</b><br/>rewrites them") --> QC
-    QC2 -- yes --> F10("<b>Our app</b><br/>does not send, logs,<br/>alerts the team") --> E13(("<b>End</b>"))
-    QC -- yes --> WT("<b>Scheduler → Queue</b><br/>the step is due,<br/>picks up the job")
-    WT --> Q0{"Already sent?<br/>same message id"}
+    S(("<b>Text step<br/>is due</b>")) --> A1("<b>Scheduler → Queue</b><br/>picks up the job. Ready: today's message,<br/>and an iMessage version if the lead<br/>passed the iMessage check")
+    A1 --> Q0{"Already sent?<br/>same message id"}
     Q0 -- yes --> E0(("<b>End</b>"))
     Q0 -- no --> QS{"Step still wanted?<br/>no reply, purchase or opt-out<br/>since it was written, and inside<br/>the campaign's frequency cap"}
     QS -- no --> X3("<b>Queue</b><br/>drops or holds the step,<br/>as today, logs why") --> E14(("<b>End</b>"))
-    QS -- yes --> QI{"iMessage check<br/>still passes?"}
+    QS -- yes --> QV{"iMessage version<br/>ready?"}
+    QV -- no --> SMS0("<b>Scheduler → today's path</b><br/>sends today's message as today,<br/>from the store's own number"):::sms --> E1(("<b>End</b>"))
+    QV -- yes --> QI{"iMessage check still passes?<br/>store on, consent, not opted out"}
     QI -- no --> SMS1("<b>Our app → today's path</b><br/>hands the step back to the<br/>campaign: it runs as if<br/>iMessage were off"):::sms --> E2(("<b>End</b>"))
     QI -- yes --> QL{"Inside the lead's<br/>state legal hours?"}
     QL -- no --> R1("<b>Queue</b><br/>moves the step to the next window") --> E4(("<b>End</b>"))
@@ -87,11 +73,11 @@ flowchart TD
     classDef out fill:#e3f5e1,stroke:#2e7d32,stroke-width:2px,color:#1f2328
     classDef sms fill:#e2ecfb,stroke:#2563eb,stroke-width:2px,color:#1f2328
     class S start
-    class E0,E1,E2,E4,E5,E6,E7,E9,E10,E11,E13,E14 finish
-    class Q1,Q2,Q3,Q4,QG,Q10,Q11,QC,QC2,Q0,QS,QI,QL,Q5,Q6,Q7,Q8,Q9,Q12,Q13,Q14,Q15 decision
-    class W1,L1,L2,AI2,AI1,AI4,F10,WT,X3,R1,X1,X2,R2,R3,SEND,OK2,PH,R4 action
-    linkStyle 4,8,10,12,14,15,18,24,26,28,32,35,38,40,41,44,47,50,56,58,63,66 color:#15803d,stroke:#6b7280
-    linkStyle 1,5,7,11,13,17,19,21,22,29,30,33,36,39,42,46,49,52,54,62,64,68 color:#b91c1c,stroke:#6b7280
+    class E0,E1,E2,E4,E5,E6,E7,E9,E10,E11,E14 finish
+    class Q0,QS,QV,QI,QL,Q5,Q6,Q7,Q8,Q9,Q12,Q13,Q14,Q15 decision
+    class A1,X3,R1,X1,X2,R2,R3,SEND,OK2,PH,R4 action
+    linkStyle 2,6,9,12,15,17,18,21,24,27,33,35,40,43 color:#15803d,stroke:#6b7280
+    linkStyle 3,4,7,10,13,16,19,23,26,29,31,39,41,45 color:#b91c1c,stroke:#6b7280
 ```
 
 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 the step goes back to the campaign: it leaves from the store's own number, as today
