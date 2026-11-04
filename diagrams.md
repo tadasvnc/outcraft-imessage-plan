@@ -4,12 +4,11 @@ Back to the plan: [README.md](README.md)
 
 **Why B and C:** messages leave a number and replies come back only in these two, so most failures happen here. A is manual in v1, and D is covered by the plan's section 3.
 
-**Where this sits in today's flow:** lead joins a campaign → before each text step, the **iMessage check** → AI writes today's message as usual, plus an iMessage version if the lead can get it → scheduler: step is due → **B:** send-time checks, then iMessage from line X, or the step goes back to the campaign → **C:** statuses and replies → AI answers. Leads who can't get iMessage keep today's path.
+**Where this sits in today's flow:** lead joins a campaign → before each text step, the **iMessage check** → AI writes today's message as usual, plus an iMessage version if the lead can get it → scheduler: step is due → **B**, only for leads who passed: send-time checks, then iMessage from line X, or the step goes back to the campaign → **C:** statuses and replies → AI answers. Leads who can't get iMessage keep today's path.
 
 **How to read:**
 - 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 today's path: the step runs as if iMessage were off, the campaign's way, never from line X
 - **Today's path** (🟦 blue boxes): what Outcraft does today, without iMessage. The step goes back to the campaign and runs as if iMessage were off, with the campaign's own channel, settings, frequency caps and checks. Often that's SMS from the store's own number, sometimes a call. The campaign decides, not B. The message is already written, so it goes at once, with no AI call.
-  - **Scheduler → today's path:** the lead never got an iMessage version (Android, no consent). Nothing changes for them.
   - **Our app → today's path:** iMessage was possible, but a send-time check or the provider said no. Our app hands the step back at once and logs why.
   - **AI → today's path** (diagram C): line X fails mid-chat, so the AI rewrites its answer for the campaign's other text channel.
 - **Who does it:** our app, the scheduler, the queue, the AI, the provider, or the lead's phone.
@@ -26,22 +25,22 @@ Back to the plan: [README.md](README.md)
 
 ---
 
-## B. Sending a message: a step is due, up to the message leaving a number (or not)
+## B. Sending a message: a step is due for an iMessage lead, up to the message leaving a number (or not)
 
 **Before B, when the AI writes the step** (not drawn, it's one check):
 1. **iMessage check:** iMessage on for the store and the campaign, a US/CA number, texting consent, not opted out, passes Do Not Call, not in FL, MD or OK during the pilot, the lookup says iMessage (cached 30 days), the iMessage group of the pilot, not handed back to today's path earlier in this campaign, and fewer than 2 unanswered iMessages. Any error, timeout or unknown means no.
 2. **The AI writes today's message** as usual (for an iMessage step: the message for its fallback, none for a call). If the check passed, it also writes an **iMessage version**: a short question with no link until the lead has written to our line, then the full message.
 3. **Both pass our content check,** or the AI rewrites them once. Still failing: nothing is sent, and the team is alerted.
 
+**Leads who fail the check** (Android, no consent, outside the pilot group) get only today's message. The step runs as today and never enters B.
+
 ```mermaid
 %%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica, Arial, sans-serif", "primaryColor": "#ffffff", "primaryBorderColor": "#d0d4db", "primaryTextColor": "#1f2328", "lineColor": "#6b7280", "edgeLabelBackground": "#ffffff"}, "themeCSS": "foreignObject { overflow: visible; } .nodeLabel { white-space: nowrap; }", "flowchart": {"curve": "basis", "nodeSpacing": 40, "rankSpacing": 45, "padding": 18}}}%%
 flowchart TD
-    S(("<b>Text step<br/>is due</b>")) --> A1("<b>Scheduler → Queue</b><br/>fires the step inside sending hours<br/>(inside state law), the queue picks up the job.<br/>Ready: today's message, and an iMessage<br/>version if the lead passed the iMessage check")
+    S(("<b>Step due for<br/>an iMessage<br/>lead</b>")) --> A1("<b>Scheduler → Queue</b><br/>fires the step inside sending hours<br/>(inside state law), the queue picks up the job.<br/>Ready: the iMessage version, and<br/>today's message as the fallback")
     A1 --> Q0{"Today's checks pass?<br/>not sent yet, no reply, purchase<br/>or opt-out since it was written,<br/>inside the frequency cap"}
     Q0 -- no --> X3("<b>Scheduler</b><br/>drops or holds the step,<br/>as today, logs why") --> E0(("<b>End</b>"))
-    Q0 -- yes --> QV{"iMessage version<br/>ready?"}
-    QV -- no --> SMS0("<b>Scheduler → today's path</b><br/>runs the step as if<br/>iMessage were off"):::sms --> E1(("<b>End</b>"))
-    QV -- yes --> QI{"iMessage still on?<br/>for everyone, this store,<br/>this campaign"}
+    Q0 -- yes --> QI{"iMessage still on?<br/>for everyone, this store,<br/>this campaign"}
     QI -- no --> SMS1("<b>Our app → today's path</b><br/>hands the step back to the<br/>campaign: it runs as if<br/>iMessage were off"):::sms --> E2(("<b>End</b>"))
     QI -- yes --> Q7{"Line X<br/>healthy?"}
     Q7 -- no --> SMS2("<b>Our app → today's path</b><br/>hands the step back now,<br/>logs why"):::sms --> E4(("<b>End</b>"))
@@ -68,11 +67,11 @@ flowchart TD
     classDef out fill:#e3f5e1,stroke:#2e7d32,stroke-width:2px,color:#1f2328
     classDef sms fill:#e2ecfb,stroke:#2563eb,stroke-width:2px,color:#1f2328
     class S start
-    class E0,E1,E2,E4,E5,E6,E7,E8 finish
-    class Q0,QV,QI,Q7,Q6,Q8,Q13,Q14,Q15 decision
+    class E0,E2,E4,E5,E6,E7,E8 finish
+    class Q0,QI,Q7,Q6,Q8,Q13,Q14,Q15 decision
     class A1,X3,SEND,OK2,PH,R4 action
-    linkStyle 4,7,10,13,14,16,20,25,28 color:#15803d,stroke:#6b7280
-    linkStyle 2,5,8,11,15,17,24,26,30 color:#b91c1c,stroke:#6b7280
+    linkStyle 4,7,10,11,13,17,22,25 color:#15803d,stroke:#6b7280
+    linkStyle 2,5,8,12,14,21,23,27 color:#b91c1c,stroke:#6b7280
 ```
 
 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 today's path: the step runs as if iMessage were off, the campaign's way, never from line X
