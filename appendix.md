@@ -41,7 +41,7 @@ Back to the plan: [README.md](README.md) · [Diagrams](diagrams.md)
 **Provider details that shape the build.** From Blooio's docs (our pick):
 - Before a written reply, a chat allows 3 plain-text messages, and links and media are blocked (`conversation_content_restricted`). Our no-link rule and "two unanswered → next channel" stay inside that.
 - The `one_way` rule: over 10 new chats a day (3-day average) with under 40% written replies slows the line, then pauses new chats. Sizing has to allow for it (section F).
-- Its 429 errors such as `conversation_awaiting_reply` aren't temporary, and retrying won't help. Our retry logic reads the error key, not just the status code, and sends these to the next channel at once.
+- Its 429 errors such as `conversation_awaiting_reply` aren't temporary, and retrying won't help. Our retry logic reads the error key, not just the status code, and sends the SMS version at once.
 - The `safety.state_changed` webhook and the health endpoint (polled every 5 minutes) feed our health job.
 - One banned number slows every number on the account for 72 hours (`sibling_ban`), so each store gets its own sub-account.
 - SMS fallback runs only through our own Twilio account. We leave it off and fall back to the campaign's next channel.
@@ -71,9 +71,9 @@ The plan lists the main ones. The full list:
 | **One customer's content** | Adult, drug or scam content can get our *whole* provider account closed, with no refund. | Admins check what the brand sells before turning it on (list below). Every AI message passes a content check. Watch opt-outs and "who is this" replies per customer. Sub-account and kill switch per customer. |
 | **Apple ends the channel** | Apple blocks the providers' method for everyone, overnight. | Leads fall back to the next channel automatically. We lose the blue bubble, not the leads. See section I. |
 | **Provider down** | Every send fails and retries 3 times, so carts wait. Replies sent while webhooks are down are lost. | If most sends fail for 5 minutes, a circuit breaker turns iMessage off for everyone and steps go on the next channel. It turns back on after a test send works. The catch-up job collects missed replies. |
-| **Not enough lines** | Carts go cold within an hour, and 50 a day fills fast. | If every line's daily cap is used, the step goes on the next channel at once. If only the hourly cap is full, it waits at most 10 minutes. Size lines with the formula in section F. |
-| **Slow fallback** | A failed iMessage waits behind the campaign queue, or for its retries, while the cart goes cold. | The fallback is a new job on the priority queue, due now (Laravel workers read the high queue first). Retries take 10 s, 30 s and 60 s, so the next channel's message leaves within about 2 minutes. Errors that retrying won't fix go to the next channel at once. |
-| **Lead not on iMessage** | Android (about 4 in 10 US phones), iMessage turned off, numbers outside the US, numbers that moved to Android but are still registered with Apple. | Look the number up before the first send and cache it for 30 days. A downgrade, or no receipt within 15 minutes → this step goes again on the next channel, and the cache is cleared. v1 covers US/CA only. See section C. |
+| **Not enough lines** | Carts go cold within an hour, and 50 a day fills fast. | If every line's daily cap is used, the SMS version goes at once. If only the hourly cap is full, it waits at most 10 minutes. Size lines with the formula in section F. |
+| **Failed iMessage** | A failed message waits while the cart goes cold, or a resend reaches the lead twice. | The AI writes the SMS version ahead, next to the iMessage one. If we know the iMessage didn't arrive (refused after 10 s, 30 s and 60 s retries, failed, not on iMessage), the SMS version goes at once, with no AI call. If we don't know (no receipt in 15 minutes), we don't resend: the lead is marked, and the next step in the sequence goes by SMS. Live chat answers go first in the queue, before normal steps. |
+| **Lead not on iMessage** | Android (about 4 in 10 US phones), iMessage turned off, numbers outside the US, numbers that moved to Android but are still registered with Apple. | Look the number up before the first send and cache it for 30 days. "Not on iMessage" → the SMS version at once. No receipt within 15 minutes → no resend; the cache is cleared and the next step goes by SMS. If the lookup itself fails, the lead gets SMS, as today. v1 covers US/CA only. See section C. |
 | **Cost** | Lines are a fixed monthly cost. Long chats also cost more in AI calls. | The pilot splits iPhone leads 50/50, with and without iMessage. See section F. |
 | **Opt-out** | iMessage has no carrier STOP. | We detect STOP, "unsubscribe" and similar ourselves, opt the lead out on all channels and send one confirmation. |
 | **Webhooks** | Duplicates, late or out-of-order events, missed retries. | Check the signature, skip events we've seen, save then queue. A catch-up job every 5 min pulls missed events and messages with no receipt after 15 minutes. |
@@ -96,7 +96,7 @@ About 4 in 10 US phones in use are Android (StatCounter, mid-2026: iOS 58–61%,
 - **iMessage can only reach the iPhone share.** At best it lifts about 6 in 10 US leads. The rest stay on the campaign's other channels, and we sell it that way.
 - **Pilot stores with iPhone-heavy shoppers.** We ask each candidate store for its iPhone share of mobile visits; any analytics tool shows it. A line priced per month pays off poorly for a store at 40%.
 - **Compare iPhone with iPhone.** See section G.
-- **Numbers that moved to Android.** Apple can keep a number registered for iMessage after its owner leaves iPhone, until they deregister it. Messages to it vanish, or land on an old iPad or Mac. The 30-day cache makes this worse. No receipt within 15 minutes sends the step again on the next channel and clears the cache. The "two unanswered, then next channel" rule catches the rest.
+- **Numbers that moved to Android.** Apple can keep a number registered for iMessage after its owner leaves iPhone, until they deregister it. Messages to it vanish, or land on an old iPad or Mac. The 30-day cache makes this worse. No receipt within 15 minutes clears the cache, and the next step goes by SMS. The "two unanswered, then next channel" rule catches the rest.
 - **SMS to Android is changing too.** Google Messages warns about links from unknown senders and hides suspected scams. It was piloted in 2024 in a few countries, with a wider rollout planned. Our SMS results on Android may get weaker either way.
 - **RCS is the answer for Android.** Business RCS now runs on all major US carriers, through Google Messages on Android. It shows a verified brand name and logo, and allows links and buttons. Carrier approval takes 2–6 weeks. It is the natural next channel for the leads iMessage can't reach. Not confirmed: which US carriers show business RCS on iPhone.
 - **Other markets:** Lithuania is about 63–70% Android, and Australia about 60–64% iPhone. iMessage fits the US, Canada and Australia. In most of the EU, WhatsApp, already a channel, matters more.
@@ -177,7 +177,7 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 
 **Build (weeks 4–7)**
 - **Replies first (diagram C), weeks 4–5:** provider interface, webhooks with the catch-up job, STOP handling, chat rules (typing dots, 15 s wait, a cap of 30), content check.
-- **Then sending (diagram B), weeks 6–7:** lookup, per-line limits, no-link rules, health alerts, next-channel fallback, the random split.
+- **Then sending (diagram B), weeks 6–7:** the iMessage check before writing, two versions (iMessage and SMS), per-line limits, no-link rules, health alerts, the random split.
 
 **Pilot: we write first (weeks 8–11)**
 - 2–3 US stores, switched on by our admins. We pay for the lines.
@@ -231,7 +231,7 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 4. Do the contact-hour and frequency controls already cover state rules (FL, MD, OK, TX)? Do they apply to AI replies?
 5. Where is consent stored?
 6. Is there a common channel interface?
-7. Does the AI write a step's message when it's due, or earlier? With iMessage, the channel is known only when the step is due.
+7. Does the AI write a step's message ahead, or when it's due? We plan to write the iMessage and SMS versions ahead, after the iMessage check.
 8. What share of our stores' shoppers use iPhones?
 9. Have you looked at RCS for Business?
 10. How much downside is acceptable if Apple cut iMessage off overnight?
