@@ -4,7 +4,7 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 
 **In short:** iMessage becomes a fifth channel, for iPhone leads. The rest stay on the other channels.
 
-- **Step 0:** count reachable shoppers, test one line by hand. **Then build:** 4 weeks, one engineer.
+- **Step 0:** count reachable shoppers, test one line. **Then build:** 4 weeks, one engineer.
 - **Pilot**, 2–3 US stores: half the iPhone shoppers get iMessage, half don't. Go or no-go in week 12.
 
 ## 1. Provider: which one, and why
@@ -13,7 +13,7 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 - **Compared** on price, limits, health data, security: Blooio, Linq, Sendblue, Photon, own Macs.
 - **Suggestion: Blooio**, with a data agreement and only the data a message needs. Plan B: Linq.
 - **Why:** public prices ($195 a line at 6+), live in days, hard limits that catch our mistakes.
-- **Not Sendblue:** it sells its own iMessage cart recovery to Shopify stores, our market, so it would see our customers' shoppers and volumes. It also had a data breach in July 2026.
+- **Not Sendblue:** it competes with us, selling iMessage cart recovery to stores. And a 2026 breach.
 
 ## 2. Risks: what breaks at volume, and what we do
 
@@ -44,7 +44,7 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 - **Today:** there are no iMessage lines yet, so there is nothing to watch.
 - **Suggestion:** every 15 minutes a job reads the provider's warnings and our numbers, and acts:
   - **Yellow** (delivery under 90% or opt-outs over 2%): halve the daily limit, alert Slack.
-  - **Red** (blocked, or delivery under 70%): no new leads, chats move to SMS, alert Slack and the store.
+  - **Red** (blocked, or delivery under 70%): no new leads, chats to SMS, alert Slack and the store.
 - **Why:** the system acts first and Slack tells the team. On-call only replaces red lines, within a day.
 
 ## 4. Who turns it on: our admins, every store, or a plan
@@ -63,10 +63,13 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 
 ## 6. First version and time
 
-- **Step 0, before building:** count shoppers, then one line by hand for 2–3 weeks (~$300). If cold messages get it flagged, plan B: leads write to us first.
+- **Step 0, before building (2–3 weeks, ~$300):** a cheap test of the two biggest unknowns.
+  - **Count:** carts a day with consent and US/CA number, and iPhone share (lookup on 500).
+  - **Test one line, one store:** a throwaway script sends a fixed iMessage to half the iPhone carts; the other half get SMS. Replies go to Slack, and support answers (about 30 min a day).
+  - **Result:** 2× replies, no flag → build. Flagged → plan B: shoppers write first. Too few → stop.
 - **In v1, in build order:** replies (diagram C): webhooks, AI answers and STOP, live before the first send. Then sending (diagram B): iMessage check, two versions, line limits, alerts.
 - **How long:** 4 weeks of building for one engineer, 12 weeks from step 0 to the decision.
-- **Blocks us:** data agreement, legal on consent. **Could slip:** a ban, few replies, SMS-only code.
+- **Blocks us:** data agreement, 10 days' notice to stores for a new vendor, legal on consent. **Could slip:** a ban, few replies, SMS-only code.
 - **Where we simplified, what waits:** self-serve and billing (needs pilot data), a dashboard (Slack does it), photos, a second provider, countries beyond US/CA.
 - **Go or no-go**, against the half without iMessage: step 0 needs twice the replies. The pilot needs 2 more carts recovered per 100 leads, say 12 instead of 10.
 - **Questions:** Is iMessage live? Does SMS consent cover it? Do channels share one send path? Does the AI write a step ahead?
