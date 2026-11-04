@@ -16,9 +16,9 @@ Back to the plan: [README.md](README.md)
 - **iMessage switches:** one for everyone on Outcraft (our team, or the circuit breaker when the provider is down), one per store (our admins), one per campaign. All three must be on.
 - **Which steps:** iMessage is a fifth channel. A text step is an SMS step or an iMessage step. A campaign can add iMessage steps, each with a fallback the campaign sets (SMS or a call). For a lead on iMessage, SMS steps also go from line X. One number per lead: after a hand-back, the lead's next steps run as today.
 - **Today's message:** what the campaign sends without iMessage. For an SMS step, the AI writes it as today. For an iMessage step, it's the message for its fallback (nothing to write for a call). The AI also writes an iMessage version.
-- **What B leaves to today's system:** sending hours and state legal hours (the scheduler fires the step inside them), opt-out and frequency caps (the send-time checks). B adds only the iMessage on-switch and line X's limits.
+- **What B leaves to today's system:** sending hours, state legal hours and the frequency cap (the scheduler fires the step inside them); reply, purchase and opt-out (the campaign's shared check, the same one SMS uses, run again at send time). B adds only the iMessage on-switch and line X's limits.
 - **Legal hours in C:** live replies skip the scheduler, so C checks legal hours itself, with the same rule. It checks before the AI writes, so no answer waits for hours and goes out stale.
-- **Checks in two places:** the full iMessage check runs before writing. At send time, the send-time checks and the on-switch run again, so nothing stale goes out. If the check, or the lookup, fails, the lead stays on today's path.
+- **Checks in two places:** the full iMessage check runs before writing. At send time, the campaign's shared check and the on-switch run again, so nothing stale goes out. If the check, or the lookup, fails, the lead stays on today's path.
 - **When iMessage fails:** if we know it didn't arrive (refused, failed, not on iMessage), today's message goes at once, the campaign's way. If we don't know (no receipt in 15 min), we don't resend, so the lead never gets both. The lead is marked, and the next steps run as today.
 - **The call after a text:** their default sequence calls about 3 minutes after a text step. That stays. If the lead replies first, the reply cancels scheduled steps, including that call (diagram C).
 - **Logging:** every refusal, retry, fallback and drop is logged with its reason and the provider's error key.
@@ -37,9 +37,9 @@ Back to the plan: [README.md](README.md)
 ```mermaid
 %%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica, Arial, sans-serif", "primaryColor": "#ffffff", "primaryBorderColor": "#d0d4db", "primaryTextColor": "#1f2328", "lineColor": "#6b7280", "edgeLabelBackground": "#ffffff"}, "themeCSS": "foreignObject { overflow: visible; } .nodeLabel { white-space: nowrap; }", "flowchart": {"curve": "basis", "nodeSpacing": 40, "rankSpacing": 45, "padding": 18}}}%%
 flowchart TD
-    S(("<b>Step due for<br/>an iMessage<br/>lead</b>")) --> A1("<b>Scheduler → Queue</b><br/>fires the step inside sending hours<br/>(inside state law), the queue picks up the job.<br/>Ready: the iMessage version, and<br/>today's message as the fallback")
-    A1 --> Q0{"Still OK to send now?<br/>not sent yet, inside the frequency cap,<br/>and since it was written the lead<br/>hasn't replied, bought or opted out"}
-    Q0 -- no --> X3("<b>Scheduler</b><br/>drops it (sent, replied, bought,<br/>opted out) or holds it (frequency<br/>cap), as today, logs why.<br/>A reply is answered in C") --> E0(("<b>End</b>"))
+    S(("<b>Step due for<br/>an iMessage<br/>lead</b>")) --> A1("<b>Scheduler → Queue</b><br/>fires the step inside sending hours<br/>(inside state law) and the frequency cap,<br/>the queue picks up the job.<br/>Ready: the iMessage version, and<br/>today's message as the fallback")
+    A1 --> Q0{"Still OK to send now?<br/>the campaign's shared check, as for SMS:<br/>not sent yet, and since it was written<br/>the lead hasn't replied, bought or opted out"}
+    Q0 -- no --> X3("<b>Scheduler</b><br/>drops it (sent, replied, bought,<br/>opted out), logs why.<br/>A reply is answered in C") --> E0(("<b>End</b>"))
     Q0 -- yes --> QI{"iMessage still on?<br/>for everyone, this store,<br/>this campaign"}
     QI -- no --> SMS1("<b>Our app → today's path</b><br/>hands the step back to the<br/>campaign: it runs as if<br/>iMessage were off"):::sms --> E2(("<b>End</b>"))
     QI -- yes --> Q7{"Line X<br/>healthy?"}
