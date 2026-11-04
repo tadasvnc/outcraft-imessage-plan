@@ -5,7 +5,7 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 **In short:** iMessage becomes a fifth channel, for iPhone leads. The rest stay on the other channels.
 
 - **Step 0:** count reachable shoppers, test one line. **Then build:** 4 weeks, one engineer.
-- **Pilot**, 2–3 US stores: half the iPhone shoppers get iMessage, half don't. Go or no-go in week 12.
+- **Pilot**, 2–3 US stores, a line each: random iPhone shoppers get iMessage. Decision in week 12.
 
 ## 1. Provider: which one, and why
 
@@ -21,7 +21,7 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 | Risk | What breaks | What we do |
 |---|---|---|
 | **Apple blocks a line** | Junk reports or bursts block the number. Its chats drop. | New chats ramp 10 → 25 → 50 a day. Consent only, no nights. |
-| **Not enough lines** | A line starts about 50 new chats a day. Carts go cold in an hour. | Lines full → today's message at once. About 1 line per 40 leads a day. |
+| **Not enough lines** | A line starts about 50 new chats a day. Carts go cold in an hour. | One line per store in v1. Full → today's message at once, no waiting. |
 | **Failed iMessage** | A failed message waits while the cart goes cold. | Today's message goes at once. No receipt → no resend; next steps run as today. |
 | **No link before a reply** | iPhones disable links from strangers. | A short question first, the link after a reply. |
 | **Lead not on iMessage** | About 4 in 10 US phones are Android. | We look it up first. Not on iMessage → today's path. |
@@ -36,7 +36,7 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 |---|---|---|---|
 | **Sending hours** | Every step waits for sending hours. | Reply at once to a lead who just wrote, within the law. | Live chat: a next-morning answer loses the lead. |
 | **Reply limit** | After 5 replies: a person. | Keep the chat going, up to 30 AI replies, then a person. | Going silent mid-chat loses the lead. |
-| **Message writing** | The AI writes, then the scheduler sends. | If the lead can get iMessage, the AI also writes an iMessage version. | A free line is only known at send time. With both ready, no AI call when sending. |
+| **Message writing** | The AI writes, then the scheduler sends. | For a lead on iMessage, the AI writes two versions: iMessage and the fallback. | A free line is only known at send time. With both ready, no AI call when sending. |
 | **Sender number** | Each store's own SMS number. | Every text step from one line, until a fallback. | Same app as SMS. Two numbers look like a scam. |
 | **Follow-ups and calls** | Steps and calls run on schedule. | A reply or purchase cancels them. No calls mid-chat. | No "still thinking?" after "yes, buying". |
 
@@ -50,7 +50,7 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 ## 4. Who turns it on: our admins, every store, or a plan
 
 - **Today:** each campaign switches its channels on: calls, SMS, email, WhatsApp.
-- **Suggestion:** only our admins in v1, and we pay for pilot lines. Later, a paid add-on per line.
+- **Suggestion:** our admins only in v1, one line per store, paid by us. Later, a paid add-on per line.
 - **Why:** lines cost money and need warm-up, and one bad store can get us all banned.
 
 ## 5. Which leads get it, and what happens to the rest
@@ -58,18 +58,18 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 - **Today:** a lead is reached on every channel their campaign has switched on.
 - **Suggestion:** only leads with a US/CA number, consent and iMessage (we check first).
 - **One number per lead:** in the campaign, iMessage is a fifth channel. On the phone, it shares the Messages app with SMS, so a lead hears from one number at a time.
-- **The rest** (Android, no consent, no free line): today's path. We log why.
+- **The rest** (Android, no consent, no free slot): today's path. We log why.
 - **Why:** iMessage works only on iPhones and costs 20× more. The pilot compares iPhones only.
 
 ## 6. First version and time
 
 - **Step 0, before building (2–3 weeks, ~$300):** a cheap test of the two biggest unknowns.
   - **Count:** carts a day with consent and US/CA number, and iPhone share (lookup on 500).
-  - **Test one line, one store:** a throwaway script sends a fixed iMessage to half the iPhone carts; the other half get SMS. Replies go to Slack, and support answers (about 30 min a day).
-  - **Result:** 2× replies, no flag → build. Flagged → retry slower, after missed calls. Too few → stop.
+  - **Test one line, one store:** a throwaway script sends a fixed iMessage to random iPhone carts, up to the line's cap; the rest get SMS. Support answers replies in Slack (30 min a day).
+  - **Result:** 2× replies, no flag → build. Flagged → retry slower, after missed calls. Else stop.
 - **In v1, in build order:** replies (diagram C): webhooks, AI answers and STOP, live before the first send. Then sending (diagram B): iMessage check, two versions, line limits, alerts.
 - **How long:** 4 weeks of building for one engineer, 12 weeks from step 0 to the decision.
-- **Blocks us:** data agreement, vendor notice, consent. **Could slip:** a ban, few replies, SMS-only code.
-- **Where we simplified, what waits:** self-serve and billing (needs pilot data), a dashboard (Slack does it), photos, a second provider, countries beyond US/CA.
-- **Go or no-go**, against the half without iMessage: twice the replies in step 0, then 2 more carts recovered per 100 leads in the pilot (12, not 10).
-- **Questions:** Is iMessage live? Does SMS consent cover it? Do channels share one send path? Does the AI write a step ahead?
+- **Blocks us:** data agreement, vendor notice, consent. **Could slip:** bans, few replies, SMS-only code.
+- **Where we simplified, what waits:** more lines per store, self-serve and billing (needs pilot data), a dashboard (Slack does it), photos, a second provider, countries beyond US/CA.
+- **Go or no-go**, against iPhone shoppers without iMessage: twice the replies in step 0, then 2 more carts recovered per 100 leads in the pilot (12, not 10).
+- **Questions:** Is iMessage live? Does SMS consent cover it? A shared send path? Does the AI write ahead?
