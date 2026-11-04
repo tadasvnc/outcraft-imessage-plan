@@ -11,9 +11,9 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 
 - **Today:** no provider yet.
 - **Compared** on price, limits, health data, security: Blooio, Linq, Sendblue, Photon, own Macs.
-- **Suggestion: Blooio** for step 0 and the pilot, with a data agreement and only the data a message needs.
-- **Why:** the only public price, the lowest at volume, live in days, hard limits that catch our mistakes.
-- **Not Linq yet:** one iMessage check per 10 seconds is too slow for us. We compare again at scale.
+- **Suggestion: Blooio** for step 0 and the pilot, with a data agreement and minimal shopper data.
+- **Why Blooio:** it enforces clear rules (no early links, few unanswered messages), so our mistakes can't get a line banned. Self-serve, known price.
+- **Not Linq yet:** it only warns and leaves pausing to us. It's bigger, so we compare again at scale.
 - **Not Sendblue:** it competes with us, selling iMessage cart recovery to stores. And a 2026 breach.
 
 ## 2. Risks: what breaks at volume, and what we do
@@ -66,10 +66,10 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 - **Step 0, before building (2–3 weeks, ~$300):** a cheap test of the two biggest unknowns.
   - **Count:** carts a day with consent and US/CA number, and iPhone share (lookup on 500).
   - **Test one line, one store:** a throwaway script sends a fixed iMessage to half the iPhone carts; the other half get SMS. Replies go to Slack, and support answers (about 30 min a day).
-  - **Result:** 2× replies, no flag → build. Flagged → one retry: slower, only after a missed call. Too few → stop.
+  - **Result:** 2× replies, no flag → build. Flagged → one slower retry after missed calls. Too few → stop.
 - **In v1, in build order:** replies (diagram C): webhooks, AI answers and STOP, live before the first send. Then sending (diagram B): iMessage check, two versions, line limits, alerts.
 - **How long:** 4 weeks of building for one engineer, 12 weeks from step 0 to the decision.
-- **Blocks us:** data agreement, 10 days' notice to stores for a new vendor, legal on consent. **Could slip:** a ban, few replies, SMS-only code.
+- **Blocks us:** data agreement, 10-day vendor notice, consent. **Could slip:** a ban, few replies, SMS-only code.
 - **Where we simplified, what waits:** self-serve and billing (needs pilot data), a dashboard (Slack does it), photos, a second provider, countries beyond US/CA.
-- **Go or no-go**, against the half without iMessage: step 0 needs twice the replies. The pilot needs 2 more carts recovered per 100 leads, say 12 instead of 10.
+- **Go or no-go**, against the half without iMessage: twice the replies in step 0, then 2 more carts recovered per 100 leads in the pilot (12, not 10).
 - **Questions:** Is iMessage live? Does SMS consent cover it? Do channels share one send path? Does the AI write a step ahead?
