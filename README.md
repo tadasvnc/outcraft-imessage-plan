@@ -36,7 +36,7 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 |---|---|---|---|
 | **Sending hours** | Every step waits for sending hours. | Reply at once to a lead who just wrote, within the law. | Live chat: a next-morning answer loses the lead. |
 | **Reply limit** | After 5 replies: a person. | Keep the chat going, up to 30 AI replies, then a person. | Going silent mid-chat loses the lead. |
-| **Message writing** | The AI writes, then the scheduler sends. | For a lead on iMessage, the AI writes two versions: iMessage and the fallback. | A free line is only known at send time. With both ready, no AI call when sending. |
+| **Message writing** | The AI writes, then the scheduler sends. | iMessage check first. Passed → two versions: iMessage and the fallback. | A free line is only known at send time. With both ready, no AI call when sending. |
 | **Sender number** | Each store's own SMS number. | Every text step from one line, until a fallback. | Same app as SMS. Two numbers look like a scam. |
 | **Follow-ups and calls** | Steps and calls run on schedule. | A reply or purchase cancels them. No calls mid-chat. | No "still thinking?" after "yes, buying". |
 
