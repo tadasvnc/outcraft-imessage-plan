@@ -58,7 +58,7 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 ## 5. Which leads get it, and what happens to the rest
 
 - **Today:** a lead is reached on every channel their campaign has switched on.
-- **Suggestion:** a US/CA number, consent and iMessage. Checked only where iMessage is on.
+- **Suggestion:** leads on iMessage. Checked only where iMessage is on.
 - **One number per lead:** SMS and iMessage share one app, so we text from one number.
 - **The rest** (Android, no consent, no free slot): the campaign as usual. We log why.
 - **Why:** iMessage works only on iPhones and costs 20× more. The pilot compares iPhones only.
