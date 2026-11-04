@@ -10,8 +10,8 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 ## 1. Provider: which one, and why
 
 - **Today:** no provider yet.
-- **Compared** on price, limits, health signals and security: Blooio, Linq, Sendblue (2026 breach), Photon, own Macs.
-- **Suggestion: Blooio**, with a data agreement, and its SOC 2 done before we scale. Linq if not.
+- **Compared** on price, limits, health signals and security: Blooio, Linq, Sendblue (2026 breach, sells its own cart recovery), Photon, own Macs.
+- **Suggestion: Blooio**, with a data agreement and only the data a message needs. Plan B: Linq.
 - **Why:** public prices ($195 a line at 6+), live in days, hard limits that catch our mistakes.
 
 ## 2. Risks: what breaks at volume, and what we do
