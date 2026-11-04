@@ -38,8 +38,8 @@ Back to the plan: [README.md](README.md)
 %%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica, Arial, sans-serif", "primaryColor": "#ffffff", "primaryBorderColor": "#d0d4db", "primaryTextColor": "#1f2328", "lineColor": "#6b7280", "edgeLabelBackground": "#ffffff"}, "themeCSS": "foreignObject { overflow: visible; } .nodeLabel { white-space: nowrap; }", "flowchart": {"curve": "basis", "nodeSpacing": 40, "rankSpacing": 45, "padding": 18}}}%%
 flowchart TD
     S(("<b>Step due for<br/>an iMessage<br/>lead</b>")) --> A1("<b>Scheduler → Queue</b><br/>fires the step inside sending hours<br/>(inside state law), the queue picks up the job.<br/>Ready: the iMessage version, and<br/>today's message as the fallback")
-    A1 --> Q0{"Today's checks pass?<br/>not sent yet, no reply, purchase<br/>or opt-out since it was written,<br/>inside the frequency cap"}
-    Q0 -- no --> X3("<b>Scheduler</b><br/>drops or holds the step,<br/>as today, logs why") --> E0(("<b>End</b>"))
+    A1 --> Q0{"Today's checks pass?<br/>not sent yet, inside the frequency cap,<br/>and since it was written the lead<br/>hasn't replied, bought or opted out"}
+    Q0 -- no --> X3("<b>Scheduler</b><br/>drops it (sent, replied, bought,<br/>opted out) or holds it (frequency<br/>cap), as today, logs why.<br/>A reply is answered in C") --> E0(("<b>End</b>"))
     Q0 -- yes --> QI{"iMessage still on?<br/>for everyone, this store,<br/>this campaign"}
     QI -- no --> SMS1("<b>Our app → today's path</b><br/>hands the step back to the<br/>campaign: it runs as if<br/>iMessage were off"):::sms --> E2(("<b>End</b>"))
     QI -- yes --> Q7{"Line X<br/>healthy?"}
