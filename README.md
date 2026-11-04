@@ -36,8 +36,8 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 | **Sending hours** | Every step waits for sending hours. | Reply at once to a lead who just wrote, within the law. | Live chat: a next-morning answer loses the lead. |
 | **Reply limit** | After 5 replies, a person takes over. | Keep the chat going, up to 30 AI replies, then a person. | Going silent mid-chat loses the lead. |
 | **Message writing** | The AI writes, then the scheduler sends. | Pick the channel when the step is due, then the AI writes. On fallback, it writes again. | Only then is the channel known. iMessage starts without a link. |
-| **Sender number** | Each store texts from its SMS number. | Every text step from one line, SMS steps too. Changed only on fallback. | Same app as SMS. A second number looks like a scam. |
-| **Follow-ups and calls** | Steps and calls run on schedule. | A reply or purchase cancels them. No call while the lead is chatting. | No "still thinking?" after "yes, buying". |
+| **Sender number** | Each store texts from its SMS number. | Every text step from one line. Changed only on fallback. | Same app as SMS. Two numbers look like a scam. |
+| **Follow-ups and calls** | Steps and calls run on schedule. | A reply or purchase cancels them. No calls mid-chat. | No "still thinking?" after "yes, buying". |
 
 ## 3. Line health: how the team learns without a dashboard
 
@@ -63,10 +63,10 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 
 ## 6. First version and time
 
-- **Step 0, before building:** count shoppers, then one line by hand for 2–3 weeks (~$300). If cold messages get it flagged, plan B: leads write to us first, from a link in our SMS and email.
+- **Step 0, before building:** count shoppers, then one line by hand for 2–3 weeks (~$300). If cold messages get it flagged, plan B: leads write to us first.
 - **In v1, in build order:** replies (diagram C): webhooks, AI answers and STOP, live before the first send. Then sending (diagram B): lookup, line limits, health alerts, fallback.
 - **How long:** 4 weeks of building for one engineer, 12 weeks from step 0 to the decision.
-- **Blocks us:** the data agreement, legal on consent. **Could slip:** a ban, few replies, a send path built only for SMS.
+- **Blocks us:** the data agreement, legal on consent. **Could slip:** a ban, few replies, an SMS-only send path.
 - **Where we simplified, what waits:** self-serve and billing (needs pilot data), a dashboard (Slack does it), photos, a second provider, countries beyond US/CA.
-- **Go:** against leads without iMessage, 2× the replies, then 2 points more carts recovered.
+- **Go or no-go**, against the half without iMessage: step 0 needs twice the replies, the pilot 2 points more carts recovered (say 12% instead of 10%).
 - **Questions:** Is iMessage live? Does SMS consent cover it? Do channels share one send path? Does the AI write when a step is due?
