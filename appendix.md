@@ -164,7 +164,7 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 |---|---|---|
 | 1–3 | **Step 0:** is it worth it? | Are there enough eligible shoppers, and do they reply? |
 | 4–7 | **Build:** replies (diagram C), then sending (diagram B) | — |
-| 8–11 | **Pilot:** we write first, half of the iPhone shoppers get iMessage | Does adding iMessage recover more carts? |
+| 8–11 | **Pilot:** half of the iPhone shoppers get iMessage | Does adding iMessage recover more carts? |
 | 12 | **Decision** | Go or no-go |
 
 **Step 0: is it worth it? (weeks 1–3, about $300, no build)**
@@ -173,14 +173,14 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 - **Before the first message:** Blooio goes on Outcraft's sub-processor list, 10 days before any shopper data reaches it (Outcraft's DPA, clause 7.4.3).
 - **At the same time:** provider contract, data agreement (DPA), legal check on state rules.
 - **Go on if:** a store has at least ~30 eligible shoppers a day, replies are at least 2× the other half, and the line isn't flagged.
-- **If cold messages get the line flagged:** plan B, leads write to us first (below).
+- **If cold messages get the line flagged:** one more try on a new line, with a slower ramp, and iMessage only right after a missed call, when the shopper has just heard from the brand. Flagged again → stop.
 - **Otherwise stop**, or look at RCS.
 
 **Build (weeks 4–7)**
 - **Replies first (diagram C), weeks 4–5:** provider interface, webhooks with the catch-up job, STOP handling, chat rules (typing dots, 15 s wait, a cap of 30), content check.
 - **Then sending (diagram B), weeks 6–7:** the iMessage check before writing, two versions (iMessage and SMS), per-line limits, no-link rules, health alerts, the random split.
 
-**Pilot: we write first (weeks 8–11)**
+**Pilot (weeks 8–11)**
 - 2–3 US stores, switched on by our admins. We pay for the lines.
 - Cart messages by iMessage. The step 0 line is already warm. New lines ramp 10 → 25 → 50 a day.
 - A random split among iPhone shoppers only: half get iMessage, half the campaign without it. If lines are the bottleneck, the half without can be up to 3× bigger.
@@ -189,12 +189,11 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 **Decision (week 12)**
 - **Go if**, against the half without iMessage: replies at least 2×, recovery at least 2 points higher, opt-outs no higher, and under 1 blocked line per 10 line-months (section G).
 - **Go →** a paid add-on per line, more stores, later self-serve.
-- **No-go →** plan B (leads write first), or stop and look at RCS.
+- **No-go →** stop, or look at RCS.
 - **Before growing beyond the pilot:** if our customers' security reviews ask for SOC 2 and Blooio still has none, we move to Linq.
 
 **Other notes:**
 - **The step 0 line is warm**, so the pilot uses it from day one.
-- **Plan B: leads write first.** If step 0 shows that cold messages get lines flagged, our SMS and email steps offer "Prefer iMessage? Tap here" to numbers confirmed on iMessage. The link opens a chat with the store's line and pre-fills a short code, so we can match the lead. Links work, pre-reply rules don't apply, and two-way chats warm the lines. It isn't in v1: it changes the SMS and email steps, needs the short-code matching, and depends on how many shoppers tap.
 - **If Outcraft already runs iMessage:** skip step 0 and use that data.
 - **Effort:** about 4 weeks of build for one engineer, 3–5 depending on how channel-neutral our code is. Lines for the pilot: $2,500–$6,000.
 

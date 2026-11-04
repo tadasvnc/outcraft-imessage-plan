@@ -66,7 +66,7 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 - **Step 0, before building (2–3 weeks, ~$300):** a cheap test of the two biggest unknowns.
   - **Count:** carts a day with consent and US/CA number, and iPhone share (lookup on 500).
   - **Test one line, one store:** a throwaway script sends a fixed iMessage to half the iPhone carts; the other half get SMS. Replies go to Slack, and support answers (about 30 min a day).
-  - **Result:** 2× replies, no flag → build. Flagged → plan B: shoppers write first. Too few → stop.
+  - **Result:** 2× replies, no flag → build. Flagged → one retry: slower, only after a missed call. Too few → stop.
 - **In v1, in build order:** replies (diagram C): webhooks, AI answers and STOP, live before the first send. Then sending (diagram B): iMessage check, two versions, line limits, alerts.
 - **How long:** 4 weeks of building for one engineer, 12 weeks from step 0 to the decision.
 - **Blocks us:** data agreement, 10 days' notice to stores for a new vendor, legal on consent. **Could slip:** a ban, few replies, SMS-only code.
