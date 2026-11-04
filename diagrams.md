@@ -60,6 +60,13 @@ flowchart TD
     Q15 -- yes --> SMS4("<b>Our app → today's path</b><br/>hands the step back now,<br/>logs, alerts"):::sms --> E7(("<b>End</b>"))
     Q15 -- no --> R4("<b>Queue</b><br/>retries after 10 s, 30 s, 60 s:<br/>runs every check again, logs") --> Q0
 
+    subgraph LEGEND ["Legend"]
+        direction TB
+        LG1(("<b>Start</b>")):::start ~~~ LG2(("<b>End</b>")):::finish ~~~ LG3{"A question:<br/>yes or no"}:::decision ~~~ LG4("<b>Who does it</b><br/>an action, as today"):::action ~~~ LG5("<b>Who does it</b><br/>new for iMessage"):::new ~~~ LG6("an iMessage<br/>leaves line X"):::out ~~~ LG7("today's path: runs as<br/>if iMessage were off"):::sms
+    end
+    style LEGEND fill:#ffffff,stroke:#d0d4db,color:#4b5563
+    E0 ~~~ LG1
+
     classDef start fill:#4f46e5,stroke:#4f46e5,color:#ffffff
     classDef finish fill:#1f2328,stroke:#1f2328,color:#ffffff
     classDef action fill:#ffffff,stroke:#d0d4db,color:#1f2328
@@ -148,6 +155,13 @@ flowchart TD
     style IN fill:#f8fafc,stroke:#e5e7eb,color:#4b5563
     style C1 fill:#f8fafc,stroke:#e5e7eb,color:#4b5563
     style C2 fill:#f8fafc,stroke:#e5e7eb,color:#4b5563
+
+    subgraph LEGEND ["Legend"]
+        direction TB
+        LG1(("<b>Start</b>")):::start ~~~ LG2(("<b>End</b>")):::finish ~~~ LG3{"A question:<br/>yes or no"}:::decision ~~~ LG4("<b>Who does it</b><br/>an action, as today"):::action ~~~ LG5("<b>Who does it</b><br/>new for iMessage"):::new ~~~ LG6("an iMessage<br/>leaves line X"):::out ~~~ LG7("today's path: runs as<br/>if iMessage were off"):::sms
+    end
+    style LEGEND fill:#ffffff,stroke:#d0d4db,color:#4b5563
+    E6 ~~~ LG1
 
     classDef start fill:#4f46e5,stroke:#4f46e5,color:#ffffff
     classDef finish fill:#1f2328,stroke:#1f2328,color:#ffffff
