@@ -27,6 +27,8 @@ Tadas Vinckas · [Diagrams](diagrams.md)
 | **STOP and state law** | No carrier catches STOP. Some states limit hours. | We catch STOP ourselves and use the SMS law checks. |
 | **Cost** | $0.20 a lead, against $0.01 for SMS. | It pays off for us at about 15 more carts per 1,000 leads. |
 
+### Edge cases: where iMessage needs other rules than today
+
 | Edge case | Today | Suggestion | Why |
 |---|---|---|---|
 | **Sending hours** | Every step waits for sending hours. | Reply at once to a lead who just wrote, within the law. | Live chat: a next-morning answer loses the lead. |
