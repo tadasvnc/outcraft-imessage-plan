@@ -2,7 +2,7 @@
 
 Back to the plan: [README.md](README.md)
 
-**Why B and C:** messages leave a number and replies come back only in these two, so most failures happen here. A is manual in v1, and D is covered by the plan's section 3.
+**Why B and C:** messages leave a number and replies come back only in these two, so most failures happen here. Number health (D) is checked inside them too. A is manual in v1.
 
 **Where this sits in Outcraft's flow:** lead joins a campaign → before each iMessage step, the **iMessage check** → the AI writes the step's message, by iMessage if the lead passed → scheduler: step is due → **B**, only for leads who passed: send-time checks, then iMessage from line X, or back to the AI → **C:** statuses and replies → AI answers and picks the next step. Leads who can't get iMessage get the campaign as usual.
 
@@ -11,6 +11,7 @@ Back to the plan: [README.md](README.md)
 - **Fallback** (🟦 blue boxes): when iMessage can't go, our app tells the AI that the step failed, and why, as a failed SMS does today. The AI picks the next step, as today, from the campaign's other channels: often SMS from the store's own number, sometimes a call. It never picks iMessage again for this lead in this campaign. Mid-chat, it says it's the same store, because the number changes. If the lead has no other text channel they agreed to, a person gets the chat instead.
 - **Who does it:** our app, the scheduler, the queue, the AI, the provider, or the lead's phone.
 - **Line X** is the store's iMessage line: one per store in v1, like its one SMS number. Every iMessage to the store's leads comes from it. It starts at most 10 new chats a day, then 25, then 50 as it warms up, and 15 an hour.
+- **Number health:** every failure, opt-out and provider warning updates line X's health. Weak: half the new chats, and a Slack alert. Blocked: no new chats, and Slack and the store are told (C1).
 - **iMessage switches:** one for everyone on Outcraft (our team, or the circuit breaker when the provider is down), one per store (our admins), one per campaign. All three must be on.
 - **Which steps:** iMessage is a fifth channel. In a campaign with iMessage on, a lead who passed the check gets text steps by iMessage instead of SMS. So a lead never gets SMS and iMessage from two numbers. After a fallback, the lead's next steps run as usual.
 - **What B leaves to the existing system:** sending hours, state legal hours and the frequency cap (the scheduler fires the step inside them); reply, purchase and opt-out (the campaign's shared check, the same one SMS uses, run again at send time). B adds only the iMessage on-switch and line X's limits.
@@ -108,7 +109,7 @@ flowchart TD
         Q8 -- no --> R3("<b>Our app</b><br/>cancels scheduled steps,<br/>marks the lead as replied,<br/>no-link rule lifts")
         R3 --> Q9{"A person on it,<br/>or 30 AI replies?"}
         Q9 -- yes --> R4("<b>Our app</b><br/>notifies the person, stops<br/>the typing dots, AI stays quiet") --> E9(("<b>End</b>"))
-        Q9 -- no --> QL{"Inside<br/>legal hours?"}
+        Q9 -- no --> QL{"Inside state<br/>legal hours?"}
         QL -- no --> R9("<b>Queue</b><br/>waits until the hours open.<br/>The AI writes then,<br/>with the whole chat"):::new --> R5
         QL -- yes --> R5("<b>Queue</b><br/>shows typing dots,<br/>waits 15 s (60 s at most)"):::new --> Q10{"More messages<br/>came in?"}:::new
         Q10 -- yes --> R5
@@ -119,7 +120,7 @@ flowchart TD
         QS -- no --> XS("<b>Our app</b><br/>drops the answer, logs why.<br/>A newer message gets<br/>its own answer") --> ES(("<b>End</b>"))
         QS -- yes --> Q12{"iMessage on,<br/>line X healthy?"}:::new
         Q12 -- no --> R6("<b>AI</b><br/>picks the next step, as today:<br/>for example the answer by SMS,<br/>saying 'same store, new number'"):::sms --> E10(("<b>End</b>"))
-        Q12 -- yes --> R7("<b>Queue</b><br/>priority send on line X,<br/>retries like diagram B"):::new
+        Q12 -- yes --> R7("<b>Queue</b><br/>sends now on line X,<br/>retries like diagram B"):::new
         R7 --> Q13{"Provider<br/>accepted it?"}:::new
         Q13 -- no --> R6
         Q13 -- yes --> OUT("<b>Provider</b><br/>the answer leaves line X,<br/>the number the lead wrote to"):::out

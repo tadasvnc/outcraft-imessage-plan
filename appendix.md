@@ -42,18 +42,18 @@ Back to the plan: [README.md](README.md) · [Diagrams](diagrams.md)
 - Before a written reply, a chat allows 3 plain-text messages, and links and media are blocked (`conversation_content_restricted`). Our no-link rule and "two unanswered → next channel" stay inside that.
 - The `one_way` rule: over 10 new chats a day (3-day average) with under 40% written replies slows the line, then pauses new chats. Sizing has to allow for it (section F).
 - Its 429 errors such as `conversation_awaiting_reply` aren't temporary, and retrying won't help. Our retry logic reads the error key, not just the status code, and tells the AI at once, which picks the next step.
-- The `safety.state_changed` webhook and the health endpoint (polled every 5 minutes) feed our health job.
+- The `safety.state_changed` webhook and the health endpoint (polled by the 5-minute catch-up job) feed our health check.
 - One banned number slows every number on the account for 72 hours (`sibling_ban`), so each store gets its own sub-account.
 - Its SMS fallback runs only through our own Twilio account. We leave it off, and the AI picks the next step instead.
 
 From Linq's docs (plan B):
-- A `phone_number.status_updated` webhook reports health changes (healthy, at risk, critical), so the health job uses Linq's own signal.
+- A `phone_number.status_updated` webhook reports health changes (healthy, at risk, critical), so the health check uses Linq's own signal.
 - When Linq picks the line, the recipients of a flagged line move to a fresh one (`failover_flagged`). A `continuation_message` can explain the new number.
 - A flagged Linq number also stops sending SMS, by Linq's help page. One more reason to fall back through our own channels.
 - Rate limits return 429 with `Retry-After`. The iMessage check allows one call per 10 seconds.
 
 From Sendblue's docs, if we pick it:
-- A `line_blocked` webhook exists, so the health job uses the provider's own signal.
+- A `line_blocked` webhook exists, so the health check uses the provider's own signal.
 - The lookup can answer "indeterminate". We treat that as "not on iMessage" and use the next channel.
 - Webhooks are retried only 3 times, with a 45 s timeout. If our endpoint is down for a few minutes, replies are lost. So a catch-up job pulls recent messages per line every 5 minutes (diagram C).
 - Each message can have its own status URL. We put our message id in it, so a status that arrives before our database write still matches.
@@ -78,12 +78,12 @@ The plan lists the main ones. The full list:
 | **Opt-out** | iMessage has no carrier STOP. | We detect STOP, "unsubscribe" and similar ourselves, opt the lead out on all channels and send one confirmation. |
 | **Webhooks** | Duplicates, late or out-of-order events, missed retries. | Check the signature, skip events we've seen, save then queue. A catch-up job every 5 min pulls missed events and messages with no delivery status after 15 minutes. |
 | **State law** | Quiet hours and frequency limits, AI disclosure. | See section E. |
-| **Idle lines** | Apple turns off lines with no traffic for about 2 months. | The health job flags idle lines. |
+| **Idle lines** | Apple turns off lines with no traffic for about 2 months. | The 5-minute catch-up job flags idle lines. |
 
 **Brands that don't get iMessage in v1:** prescription drugs (including erectile-dysfunction and weight-loss drugs), drug-like health claims, adult products, cannabis, CBD, vape, tobacco and alcohol, gambling, crypto, loans and debt, weapons, and anything counterfeit. These follow what US carriers already ban or restrict on SMS. Such brands keep email and calls.
 
 **Line health, starting values** (tuned in the pilot):
-- Checked every 15 min: the provider's `line_blocked` event, blocked or declined errors, delivery rate over the last 100 sends, failures in a row, replies against sends, opt-out rate, days with no sends.
+- Checked at every event, in diagrams B and C: the provider's `line_blocked` event, blocked or declined errors, delivery rate over the last 100 sends, failures in a row, replies against sends, opt-out rate. Days with no sends: the catch-up job.
 - **Yellow:** delivery under 90%, or opt-outs above 2%. The daily new-chat cap halves, and Slack gets an alert.
 - **Red:** the provider says blocked, 5 failures in a row, or delivery under 70%. No new leads on the line, its chats move to the next channel, and Slack and the customer are told. The ops on-call replaces the line within one working day.
 - A replacement line starts its warm-up again, so with one line per store, the store is back to 10 new chats a day for 2–3 weeks. More of its leads get the campaign as usual meanwhile.
@@ -188,7 +188,7 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 - **Against diagrams B and C:**
   - **Kept from B:** the checks before a first message, the iMessage lookup, the random group, the line's daily and hourly cap, our message id against double sends. If Blooio refuses a send, the shopper simply stays on the campaign.
   - **Kept from C:** the reply webhook with its signature check and repeat skipping, automatic STOP, the two fixed answers.
-  - **Waits for the full build:** AI writing and AI chat (typing dots, the 15 s wait, the 30-reply cap, handoff to a person), the fallback after a failed delivery (rare after the lookup, so only counted), retries, the health job and circuit breaker, the catch-up job, legal hours for replies (FL, MD and OK stay out of the test), iMessage steps and switches in campaigns.
+  - **Waits for the full build:** AI writing and AI chat (typing dots, the 15 s wait, the 30-reply cap, handoff to a person), the fallback after a failed delivery (rare after the lookup, so only counted), retries, the health check and circuit breaker, the catch-up job, legal hours for replies (FL, MD and OK stay out of the test), iMessage steps and switches in campaigns.
 - The module is switched off and deleted once the full build replaces it.
 
 **Test (from about day 11) and checkpoint (end of week 3)**
