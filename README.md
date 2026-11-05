@@ -37,7 +37,9 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
 
 ## 3. Number health: how the team knows without a dashboard
 
-- **Suggestion:** no extra job. Diagrams B and C check each number with every message, and Slack tells the team. A weak one starts fewer chats; a blocked one stops at once and is replaced within a day.
+- **Suggestion:** Slack tells the team when a number goes wrong. No extra job is needed: diagrams B and C check the number with every message.
+  - **Weak:** it starts fewer chats.
+  - **Blocked:** it stops at once and is replaced within a day.
 
 ## 4. Who turns it on: our admins, every store, or a plan
 
