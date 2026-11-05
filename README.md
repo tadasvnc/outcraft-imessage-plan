@@ -32,6 +32,7 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
 | Edge case | Today | Suggestion | Why |
 |---|---|---|---|
 | **Channel check** | The lead's profile shows which channels work, like phone or email. | Before the AI writes, also check for iMessage, inside today's check if there is one. | Only a lookup can tell. |
+| **The lead calls the number** | A call to the campaign number reaches the AI agent. | Blooio forwards calls on the iMessage number to our phone provider. AI calls show that same number. | One number for chat and calls. A number that doesn't answer loses the lead. |
 
 ## 3. Number health: how the team knows without a dashboard
 
@@ -45,7 +46,7 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
 ## 5. Which leads get it, and what happens to the rest
 
 - **Suggestion:** only leads whose phone has iMessage. We check only where iMessage is turned on.
-- **One number per lead:** with iMessage on, the campaign's texts go by iMessage, each with a backup (SMS or a call).
+- **One number per lead:** with iMessage on, the campaign's texts go by iMessage. If one fails, the AI picks the next step, as after a failed SMS today.
 - **Everyone else** (Android, no consent, number full for the day): the campaign as usual.
 
 ## 6. First version and time
