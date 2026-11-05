@@ -63,16 +63,11 @@ In short: iMessage could win more replies from iPhone shoppers, but it costs 20�
 
 - **Today:** iMessage isn't built yet (the site lists it: question 1).
 - **Suggestion: test first, build after.**
-  1. **Week 1, count and set up:** shoppers on iMessage (carts with consent × each store's iPhone share); stop if a store has under ~30 a day. Blooio contract, data agreement, vendor notice on day 1. Pick 3 stores. Build the module (~3 days).
-  2. **Day 11, live in 3 stores:** a fixed question; a reply gets the cart link; questions go to the store's email; STOP opts out automatically. Their campaign texts pause; the rest get the campaign as usual. Replies, clicks and purchases are counted per group; line warnings go to Slack.
-  3. **End of week 3, checkpoint:** stop only for harm: a line flagged or banned, or opt-outs above SMS. Otherwise the reply rate picks the setup: 40% or more → Blooio at full speed. Under 40% → Blooio held at 10 a day, or Linq at full speed (higher ban risk). A big early lift in carts is a strong go signal.
-  4. **Weeks 4–6, pilot:** the same setup keeps running until enough shoppers have had iMessage: about 2,560 at full speed, about 330 if lines are held at 10 a day.
-  5. **Week 7, decision:** go if iMessage recovers 2 more carts per 100 at full speed, or about 6 more if lines were held at 10 a day.
-  6. **After a go, the full build (4 weeks, one engineer):** replaces the module and adds AI chat, fallbacks, retries, the health job. Replies (diagram C) go live before sending (diagram B).
-- **Why this order:** only a 3-day module is built before we know shoppers reply and buy. Lines: 3, about $1,730 up to the decision.
-- **Why 7 weeks:** the vendor notice (10 days), the warm-up (3 weeks) and the shoppers needed set it, not the build.
-- **Why carts, not replies:** a shopper can see the message and buy without replying. Replies matter only for the line: Blooio stops new chats on a line above 10 a day with under 40% replies, so it stays near 10 a day at 4× the cost per shopper. A bigger lift is easier to prove, so the pilot still fits in the weeks.
-- **Blocks us:** data agreement, vendor notice, consent. **Could slip:** bans, stores with too few leads, a move to Linq (new lines, ~3 weeks of warm-up).
-- **What waits:** more lines per store, self-serve and billing, a dashboard (Slack does it), photos, a second provider, countries beyond US/CA.
-- **Go or no-go**, against iPhone shoppers without iMessage: no flagged lines and no more opt-outs, then 2 more carts recovered per 100 leads at full speed (12, not 10), about 6 more if lines are held at 10 a day.
-- **Questions:** Is iMessage live? SMS consent enough? Recovered carts tracked per shopper? One send path? Does the AI write ahead? A channel check before writing?
+  1. **Week 1:** count shoppers on iMessage; stop if a store has under ~30 a day. Sign Blooio, send the vendor notice, build a small test module (~3 days).
+  2. **Day 11, live in 3 stores:** a fixed question; a reply gets the cart link and the store's email; STOP opts out automatically. Their SMS pauses. Replies and purchases are counted per group.
+  3. **Week 3 checkpoint:** stop only if a line is flagged or opt-outs beat SMS. Replies under 40% → lines held at 10 a day, or Linq.
+  4. **Week 7 decision:** go if iMessage recovers 2 more carts per 100 (about 6 if lines are held back).
+  5. **After a go:** the full build, 4 weeks, one engineer: AI chat, fallbacks, health job (diagram C, then B).
+- **Why 7 weeks:** the vendor notice (10 days) and the warm-up (3 weeks) set the pace, not the build. Lines: 3, about $1,730.
+- **Blocks us:** data agreement, vendor notice, consent. **Could slip:** bans, too few shoppers, a move to Linq.
+- **Questions:** Is iMessage live? SMS consent enough? Recovered carts tracked per shopper? One send path?
