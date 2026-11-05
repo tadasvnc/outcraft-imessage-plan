@@ -131,7 +131,7 @@ About 4 in 10 US phones in use are Android (StatCounter, mid-2026: iOS 58–61%,
 ## F. Sizing and cost
 
 - **v1: one line per store**, like its one SMS number. A warm line takes about 40 new chats a day: the cap is 50, and the rest is headroom for spreading sends out and for retries. More lines per store wait until pilot data shows they pay off, because they need line choice and pinning each lead to one line.
-- **With Blooio's reply rule:** if a line's new chats get under 40% written replies, Blooio slows it to about 10 new chats a day, and a line costs about 4× more per lead. The pilot shows which case applies; step 0 gives a first hint.
+- **With Blooio's reply rule:** if a line's new chats get under 40% written replies, Blooio stops its new chats until it is back to about 10 a day, and a line costs about 4× more per lead. Then the pilot needs about 6 more carts per 100, not 2 (section H). The test shows which case applies by week 3.
 - **Example:** a store with 300 carts a day with consent and a US/CA number. If 55–70% are on iMessage, that is 165–210 leads a day. Its one line takes about 40 of them; the rest are the pilot's comparison group. At full scale it would need 5–6 lines.
 - During warm-up a line takes only 10, then 25, new chats a day. The 3 lines warm up in step 0, so the pilot starts at full volume.
 - **Cost per line:** about $195–$290 a month (Blooio list price, Linq reported at about $250, Sendblue on request). At about 1,200 new chats a line a month, that is $0.15–$0.25 a lead, against about $0.01 for SMS.
@@ -152,60 +152,71 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 | Recovery 10% → 11% | 29,502 | 296 | 99 |
 
 - **What we compare:** the iMessage group against iPhone leads without it, who get the campaign without iMessage, usually SMS. So the test answers the product question: does adding iMessage recover more carts?
-- **Go:** reply rate at least 2×, and recovery at least 2 points higher.
+- **Go:** recovery at least 2 points higher with lines at full speed, or about 6 points if Blooio holds them at 10 a day (section H). Replies only decide the setup, not the go.
 - **Guardrails:** opt-outs no higher than without iMessage, and under 1 blocked line per 10 line-months.
 - **Revenue after line costs** is tracked, but proving a 1-point lift needs about 30,000 leads, so it shows direction only.
 - **Both groups are iPhone leads.** Leads are split only after the lookup confirms iMessage. iPhone and Android shoppers differ in age and income, so comparing with all leads would flatter iMessage.
-- **One line per store sets the split.** The iMessage group is what the line takes (about 40 a day per store), and the group without iMessage is bigger. At 3×, for 10% → 12%, that cuts the iMessage leads needed from about 3,840 to about 2,560: about 3 weeks with 3 stores at 40 a day each. With fewer stores, the pilot runs longer.
-- The lines warm up in step 0, so warm-up doesn't slow the pilot. If the pilot stores have fewer than about 300 eligible leads a day, we run longer or add a store.
+- **One line per store sets the split.** The iMessage group is what the line takes (about 40 a day per store), and the group without iMessage is bigger. At 3×, for 10% → 12%, that cuts the iMessage leads needed from about 3,840 to about 2,560: about 4 weeks from the first message with 3 stores, warm-up included. With fewer stores, the pilot runs longer.
+- Test shoppers count too, since the setup doesn't change. If the pilot stores have fewer than about 300 eligible leads a day, we run longer or add a store.
 
 ## H. Rollout
 
 | Weeks | Phase | The question it answers |
 |---|---|---|
-| 1 | **Count** and paperwork | Are there enough eligible shoppers? |
-| 2–3 | **Test:** a small module sends fixed messages; replies get the cart link | Do they reply? |
-| 4 | **One week of build** for the pilot | — |
-| 5–7 | **Pilot:** a random group of iPhone shoppers gets iMessage | Does adding iMessage recover more carts? |
-| 8 | **Decision** | Go or no-go |
+| 1 | **Count**, paperwork, the test module (~3 days) | Are there enough eligible shoppers? |
+| 2–3 | **Test:** the module sends fixed messages; replies get the cart link | Do they reply? |
+| 4–6 | **Pilot:** the same setup keeps running, lines at full speed | Does adding iMessage recover more carts? |
+| 7 | **Decision** | Go or no-go |
 | After a go | **Full build:** replies (diagram C), then sending (diagram B), 4 weeks | — |
 
-**Why this order:** nothing is built before we know shoppers reply, and only one week before we know they buy. The pace is set by the vendor notice (10 days), the warm-up (3 weeks) and the pilot (3 weeks), not by the build. The test and the week of build fit inside the warm-up.
+**Why this order:** only a 3-day module is built before we know shoppers reply and buy. The test and the pilot are one run with two checkpoints, so shoppers from the test count toward the pilot. The pace is set by the vendor notice (10 days), the warm-up (3 weeks) and the shoppers needed, not by the build.
 
-**Step 0: count and test (weeks 1–3, no build)**
-- **Week 1:** provider contract, data agreement (DPA), legal check on state rules. Blooio goes on Outcraft's sub-processor list on day 1, because that must be 10 days before any shopper data reaches it (Outcraft's DPA, clause 7.4.3).
-- **Count the eligible shoppers** (a few days): carts with consent and a US/CA number, times each store's iPhone share from its analytics. A lookup on about 500 numbers confirms it once the notice has run. Pick 3 stores.
-- **Three-line test, from about day 11:** 3 stores, one Blooio line each, which go on into the pilot. A small module inside our app, behind an on/off switch (about 2 days of work), takes the store's abandoned-cart event. It checks consent, a US/CA number, not opted out, Do Not Call, not in FL, MD or OK, and 9:00–17:00 local time. It asks Blooio whether the number is on iMessage, and sends a fixed message to a random group of iPhone carts, up to the line's daily cap (10 a day at first, about 40 after 3 weeks). Once Blooio accepts the message, the shopper's campaign texts pause, so nobody hears from two numbers. The rest get the campaign as usual.
+**Week 1: count and set up**
+- Provider contract, data agreement (DPA), legal check on state rules. Blooio goes on Outcraft's sub-processor list on day 1, because that must be 10 days before any shopper data reaches it (Outcraft's DPA, clause 7.4.3).
+- **Count the eligible shoppers** (a few days): carts with consent and a US/CA number, times each store's iPhone share from its analytics. A lookup on about 500 numbers confirms it once the notice has run. Stop if a store has fewer than ~30 a day. Pick 3 stores.
+- **Build the test module** (about 3 days), inside our app behind an on/off switch.
+
+**The test module**
+- **Sending:** it takes the store's abandoned-cart event. It checks consent, a US/CA number, not opted out, Do Not Call, not in FL, MD or OK, and 9:00–17:00 local time. It asks Blooio whether the number is on iMessage, and sends a fixed message to a random group of iPhone carts, up to the line's daily cap (10 a day at first, about 40 after 3 weeks). Once Blooio accepts the message, the shopper's campaign texts pause, so nobody hears from two numbers. The rest get the campaign as usual.
 - **Four fixed messages, nobody answers by hand:**
   1. **First message:** "Hi Sam, this is the Glow Shop assistant. You left the blue scarf in your cart. Want me to save it for you?"
   2. **The shopper replies:** "Here's your cart: [link]. Questions? The Glow Shop team is at [store's support email]."
   3. **The shopper writes again,** once only: "Thanks! The Glow Shop team can help at [email]."
   4. **STOP and similar words:** the shopper is opted out on all of the store's channels through Outcraft's existing opt-out code, with one confirmation. Unclear cases ("please stop texting me") count as STOP.
-- Every reply is saved, so we can read what shoppers ask.
-- **Check at the end of week 3:** go on if a store has at least ~30 eligible shoppers a day, replies are at least 2× the rest, and no line is flagged.
-- **If cold messages get a line flagged:** one more try on a new line, with a slower ramp, and iMessage only right after a missed call, when the shopper has just heard from the brand. That store joins the pilot later. Flagged again → stop.
-- **Otherwise stop**, or look at RCS.
-
-**One week of build (week 4)**
-- The test module stays as it is. One engineer adds what a 3-week run needs:
-  - recovered carts counted for each group;
-  - a Slack alert on Blooio's safety webhook.
+- **Counting:** each shopper is tagged with their group. Replies, clicks and purchases come from Outcraft's existing tracking, so counting is a report, not new code. Every reply is saved, so we can read what shoppers ask.
+- **Alerts:** Blooio's safety webhook posts line warnings to Slack.
+- **Against diagrams B and C:**
+  - **Kept from B:** the checks before a first message, the iMessage lookup, the random group, the line's daily and hourly cap, our message id against double sends. If Blooio refuses a send, the shopper simply stays on the campaign.
+  - **Kept from C:** the reply webhook with its signature check and repeat skipping, automatic STOP, the two fixed answers.
+  - **Waits for the full build:** AI writing and AI chat (typing dots, the 15 s wait, the 30-reply cap, handoff to a person), the fallback after a failed delivery (rare after the lookup, so only counted), retries, the health job and circuit breaker, the catch-up job, legal hours for replies (FL, MD and OK stay out of the test), iMessage steps and switches in campaigns.
 - The module is switched off and deleted once the full build replaces it.
 
-**The module against diagrams B and C**
-- **Kept from B:** the checks before a first message, the iMessage lookup, the random group, the line's daily and hourly cap, our message id against double sends. If Blooio refuses a send, the shopper simply stays on the campaign.
-- **Kept from C:** the reply webhook with its signature check and repeat skipping, automatic STOP, the two fixed answers.
-- **Waits for the full build:** AI writing and AI chat (typing dots, the 15 s wait, the 30-reply cap, handoff to a person), the fallback after a failed delivery (rare after the lookup, so only counted), retries, the health job and circuit breaker, the catch-up job, legal hours for replies (FL, MD and OK stay out of the test), iMessage steps and switches in campaigns.
+**Test (from about day 11) and checkpoint (end of week 3)**
+- 3 US stores, one Blooio line each, switched on by our admins. We pay for the lines.
+- **Stop only for harm:** a line flagged or banned, or opt-outs above SMS.
+- **Why carts, not replies:** a shopper can see the message, open the store's app and buy without replying. Replies matter only for the line, through Blooio's rule: a line averaging more than 10 new chats a day with under 40% written replies is slowed, and after 48 hours (or at once under 20%) its new chats stop until it is back to 10 a day or 40% replies.
+- **The reply rate picks the setup.** The lines pass 10 new chats a day in week 2, so it shows by week 3:
 
-**Pilot (weeks 5–7)**
-- 3 US stores, one line each, switched on by our admins. We pay for the lines.
-- The lines are warm from step 0, so each takes about 40 new chats a day from day one.
-- A random split among iPhone shoppers only, sized to each store's line: about 40 a day get iMessage, the rest the campaign without it (section G).
-- Replies get the same fixed answers as in the test. A real AI chat would also answer questions in the thread, so the pilot slightly understates iMessage. That's the safe direction: if a plain link wins, the full product should do better.
-- **We measure:** replies, recovered carts, opt-outs, blocked lines, lookup accuracy, and what shoppers ask.
+| Written replies | Setup | Pilot bar (more carts per 100) |
+|---|---|---|
+| 40% or more | Blooio at full speed, ~40 new chats a line a day | 2 |
+| Under 40% | Blooio held at 10 a day, where the rule doesn't apply; about 4× the cost per shopper | about 6 |
+| Under 40% | or Linq at full speed: no reply-rate rule, but a higher ban risk and new lines (~3 weeks of warm-up) | 2 |
 
-**Decision (week 8)**, once the last pilot carts have had a few days to buy.
-- **Go if**, against iPhone shoppers without iMessage: replies at least 2×, recovery at least 2 points higher, opt-outs no higher, and under 1 blocked line per 10 line-months (section G).
+- **The pilot still fits.** A bigger lift needs fewer shoppers: about 6 more carts per 100 needs only ~330 shoppers with iMessage, about 11 days at 30 a day.
+- **Early win:** by week 3 about 700 shoppers have had iMessage, enough to spot a big lift (around 5 points) but not a 2-point one. A big early lift is a strong go signal; otherwise the week-7 decision stands.
+- **Limit:** very low replies may also look like spam to Apple, whose thresholds nobody publishes. That's why a flagged line still means stop.
+- **If cold messages get a line flagged:** one more try on a new line, with a slower ramp, and iMessage only right after a missed call, when the shopper has just heard from the brand. Flagged again → stop.
+- **Otherwise stop**, or look at RCS.
+
+**Pilot (weeks 4–6)**
+- The same setup keeps running. The lines reach full speed, about 40 new chats a day each.
+- A random split among iPhone shoppers only, sized to each store's line: about 40 a day get iMessage, the rest the campaign without it (section G). It runs until about 2,560 shoppers have had iMessage, test shoppers included.
+- Replies get the same fixed answers. A real AI chat would also answer questions in the thread, so the pilot slightly understates iMessage. That's the safe direction: if a plain link wins, the full product should do better.
+- **We measure:** replies, clicks, recovered carts, opt-outs, blocked lines, lookup accuracy, how often a line was full, and what shoppers ask.
+
+**Decision (week 7)**, once the last pilot carts have had a few days to buy.
+- **Go if**, against iPhone shoppers without iMessage: recovery at least 2 points higher at full speed (about 6 if lines were held at 10 a day), opt-outs no higher, and under 1 blocked line per 10 line-months (section G).
 - **Go →** the full build, then a paid add-on per line, more stores, later self-serve.
 - **No-go →** stop, or look at RCS.
 - **Before growing beyond the pilot:** if our customers' security reviews ask for SOC 2 and Blooio still has none, we move to Linq.
@@ -214,11 +225,11 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 - **Replies first (diagram C), weeks 1–2:** provider interface, webhooks with the catch-up job, STOP handling, chat rules (typing dots, 15 s wait, a cap of 30), content check.
 - **Then sending (diagram B), weeks 3–4:** the channel check before writing, the fallback message plus an iMessage version, iMessage steps with their fallback, per-line limits, no-link rules, health alerts, the random split.
 - **SMS-only code:** if the shared send check sits inside the SMS code, we pull it out first, about one more week.
-- The pilot's lines and support stay on meanwhile, so the 3 stores don't lose iMessage.
+- The test module keeps running meanwhile, so the 3 stores don't lose iMessage.
 
 **Other notes:**
-- **If Outcraft already runs iMessage:** skip step 0 and use that data.
-- **Effort:** one week of build before the decision, 4 weeks after a go. Lines: 3, about $1,730 up to the decision.
+- **If Outcraft already runs iMessage:** skip the test and use that data.
+- **Effort:** a 3-day module before the decision, 4 weeks after a go. Lines: 3, about $1,730 up to the decision.
 
 ## I. Platform risk
 
@@ -262,6 +273,7 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 10. Have you looked at RCS for Business?
 11. How much downside is acceptable if Apple cut iMessage off overnight?
 12. Do you already use Blooio, or have you talked to them?
+13. Does Outcraft record recovered carts per shopper? **If yes:** the test only tags each shopper's group and counting is a report. **If not:** the module records purchases itself.
 
 ## Sources
 
