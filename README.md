@@ -12,8 +12,8 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
   - **Safe:** it blocks messages that break its rules, like a link before a reply. A bug on our side costs one message, not a blocked number.
   - **Fast to start:** a public price, no setup fee, live in days.
   - **Early warning:** it tells us when a number is at risk, so we can slow down.
-- **Not Linq for now:** it only warns us and leaves stopping to us. It's our backup if Blooio's rules hold us back.
-- **Not Sendblue:** it sells its own cart recovery to stores, so it competes with us. It also had a data breach in 2026.
+- **Not Linq for now:** it only warns and leaves stopping to us. It's our backup.
+- **Not Sendblue:** it sells cart recovery to stores, so it competes with us. And a 2026 data breach.
 
 ## 2. Risks: what can go wrong, and what we do
 
@@ -32,11 +32,14 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
 | Edge case | Today | Suggestion | Why |
 |---|---|---|---|
 | **Channel check** | The lead's profile shows which channels work, like phone or email. | Before the AI writes, also check for iMessage, inside today's check if there is one. | Only a lookup can tell. |
-| **The lead calls the number** | A call to the campaign number reaches the AI agent. | Blooio forwards calls on the iMessage number to our phone provider. AI calls show that same number. | One number for chat and calls. A number that doesn't answer loses the lead. |
+| **Sending hours** | Every step waits for sending hours. | A reply goes out right away, but inside state legal hours. | A live chat can't wait until morning. Some states limit replies at night too. |
+| **Reply limit** | After 5 replies, a person reviews and the AI stops. | Up to 30 AI replies, then a person. | Chats run long. Going silent mid-chat loses the lead. |
+| **Calls instead of replying** | Not clear how it works: does the AI answer a call back to the number that texted? Asked the team. | Blooio forwards calls on the iMessage number to the store's support number. AI calls show the iMessage number. | One number for chat and calls. A number that doesn't answer loses the lead. |
+| **Still typing** | The AI answers each message. | Wait a few seconds after the last message, with typing dots, then answer once. | People type in short bursts. Many answers look like a bot. |
 
 ## 3. Number health: how the team knows without a dashboard
 
-- **Suggestion:** a job checks every number often. A weak one (messages not arriving, many shoppers asking to stop) starts fewer chats, and Slack tells the team. A blocked one stops and is replaced within a day.
+- **Suggestion:** no extra job. Diagrams B and C check each number with every message, and Slack tells the team. A weak one starts fewer chats; a blocked one stops at once and is replaced within a day.
 
 ## 4. Who turns it on: our admins, every store, or a plan
 
@@ -51,9 +54,8 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
 
 ## 6. First version and time
 
-- **Suggestion: test first, build after.**
+- **Suggestion: test first, build after.** Three Blooio numbers cost about $1,730 until the decision.
   1. **Week 1:** check that enough shoppers use iMessage. Sign Blooio, give stores the required notice, and build a small test.
-  2. **Week 2:** the test starts in three stores. Shoppers get one question, and a reply gets the cart link. We count who replies and who buys.
+  2. **Week 2:** the test starts in three stores: one question, then the cart link after a reply. We count who buys.
   3. **Week 3:** stop if a number gets blocked or shoppers ask us to stop more than on SMS. Otherwise keep going.
-  4. **Week 7:** decide. Go if iMessage wins about 2 more carts per 100 shoppers. Then one engineer builds the full version on top of the test, in a week or two.
-- **Cost until the decision:** about $1,730 for three numbers.
+  4. **Week 7:** decide. Go if iMessage wins about 2 more carts per 100 shoppers, then build the full version in a week or two.
