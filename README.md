@@ -32,8 +32,6 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
 | Edge case | Today | Suggestion | Why |
 |---|---|---|---|
 | **Channel check** | The lead's profile shows which channels work, like phone or email. | Before the AI writes, also check for iMessage, inside today's check if there is one. | Only a lookup can tell. |
-| **Sending hours** | Every step waits for sending hours. | A reply goes out right away, but inside state legal hours. | A live chat can't wait until morning. Some states limit replies at night too. |
-| **Reply limit** | After 5 replies, a person reviews and the AI stops. | Up to 30 AI replies, then a person. | Chats run long. Going silent mid-chat loses the lead. |
 | **Calls instead of replying** | Not clear how it works: does the AI answer a call back to the number that texted? Asked the team. | Blooio forwards calls on the iMessage number to the store's support number. AI calls show the iMessage number. | One number for chat and calls. A number that doesn't answer loses the lead. |
 | **Still typing** | The AI answers each message. | Wait a few seconds after the last message, with typing dots, then answer once. | People type in short bursts. Many answers look like a bot. |
 
