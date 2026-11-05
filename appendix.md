@@ -41,10 +41,10 @@ Back to the plan: [README.md](README.md) · [Diagrams](diagrams.md)
 **Provider details that shape the build.** From Blooio's docs (our pick):
 - Before a written reply, a chat allows 3 plain-text messages, and links and media are blocked (`conversation_content_restricted`). Our no-link rule and "two unanswered → next channel" stay inside that.
 - The `one_way` rule: over 10 new chats a day (3-day average) with under 40% written replies slows the line, then pauses new chats. Sizing has to allow for it (section F).
-- Its 429 errors such as `conversation_awaiting_reply` aren't temporary, and retrying won't help. Our retry logic reads the error key, not just the status code, and sends the fallback message at once.
+- Its 429 errors such as `conversation_awaiting_reply` aren't temporary, and retrying won't help. Our retry logic reads the error key, not just the status code, and tells the AI at once, which picks the next step.
 - The `safety.state_changed` webhook and the health endpoint (polled every 5 minutes) feed our health job.
 - One banned number slows every number on the account for 72 hours (`sibling_ban`), so each store gets its own sub-account.
-- SMS fallback runs only through our own Twilio account. We leave it off and fall back to the campaign's next channel.
+- Its SMS fallback runs only through our own Twilio account. We leave it off, and the AI picks the next step instead.
 
 From Linq's docs (plan B):
 - A `phone_number.status_updated` webhook reports health changes (healthy, at risk, critical), so the health job uses Linq's own signal.
@@ -71,9 +71,9 @@ The plan lists the main ones. The full list:
 | **One customer's content** | Adult, drug or scam content can get our *whole* provider account closed, with no refund. | Admins check what the brand sells before turning it on (list below). Every AI message passes a content check. Watch opt-outs and "who is this" replies per customer. Sub-account and kill switch per customer. |
 | **Apple ends the channel** | Apple blocks the providers' method for everyone, overnight. | Leads fall back to the next channel automatically. We lose the blue bubble, not the leads. See section I. |
 | **Provider down** | Every send fails and retries 3 times, so carts wait. Replies sent while webhooks are down are lost. | If most sends fail for 5 minutes, a circuit breaker turns iMessage off for everyone and steps go on the next channel. It turns back on after a test send works. The catch-up job collects missed replies. |
-| **Not enough lines** | Carts go cold within an hour, and 50 a day fills fast. | One line per store in v1. If its daily or hourly cap is full, the fallback message goes at once, with no waiting. The pilot sizes the iMessage group to fit the line (section F). |
-| **Failed iMessage** | A failed message waits while the cart goes cold, or a resend reaches the lead twice. | The AI writes the fallback message as usual, plus an iMessage version. If we know the iMessage didn't arrive (refused after 10 s, 30 s and 60 s retries, failed, not on iMessage), the fallback message goes at once, the campaign's way, with no AI call. If we don't know (no delivery status in 15 minutes), we don't resend: the lead is marked, and the next steps run as usual. Live chat answers go first in the queue, before normal steps. |
-| **Lead not on iMessage** | Android (about 4 in 10 US phones), iMessage turned off, numbers outside the US, numbers that moved to Android but are still registered with Apple. | Look the number up before the first send and cache it for 30 days. "Not on iMessage" → the fallback message at once. No delivery status within 15 minutes → no resend; the cache is cleared and the next steps run as usual. If the lookup itself fails, the lead stays on the fallback. v1 covers US/CA only. See section C. |
+| **Not enough lines** | Carts go cold within an hour, and 50 a day fills fast. | One line per store in v1. If its daily or hourly cap is full, the AI picks the next step at once, with no waiting. The pilot sizes the iMessage group to fit the line (section F). |
+| **Failed iMessage** | A failed message waits while the cart goes cold, or a resend reaches the lead twice. | If we know the iMessage didn't arrive (refused after 10 s, 30 s and 60 s retries, failed, not on iMessage), the AI gets it at once and picks the next step, as after a failed SMS today. If we don't know (no delivery status in 15 minutes), we don't resend: the lead is marked, and the next steps run as usual. Live chat answers go first in the queue, before normal steps. |
+| **Lead not on iMessage** | Android (about 4 in 10 US phones), iMessage turned off, numbers outside the US, numbers that moved to Android but are still registered with Apple. | Look the number up before the first send and cache it for 30 days. "Not on iMessage" → the AI picks the next step at once. No delivery status within 15 minutes → no resend; the cache is cleared and the next steps run as usual. If the lookup itself fails, the lead gets the campaign as usual. v1 covers US/CA only. See section C. |
 | **Cost** | Lines are a fixed monthly cost. Long chats also cost more in AI calls. | The pilot splits iPhone leads 50/50, with and without iMessage. See section F. |
 | **Opt-out** | iMessage has no carrier STOP. | We detect STOP, "unsubscribe" and similar ourselves, opt the lead out on all channels and send one confirmation. |
 | **Webhooks** | Duplicates, late or out-of-order events, missed retries. | Check the signature, skip events we've seen, save then queue. A catch-up job every 5 min pulls missed events and messages with no delivery status after 15 minutes. |
@@ -86,7 +86,7 @@ The plan lists the main ones. The full list:
 - Checked every 15 min: the provider's `line_blocked` event, blocked or declined errors, delivery rate over the last 100 sends, failures in a row, replies against sends, opt-out rate, days with no sends.
 - **Yellow:** delivery under 90%, or opt-outs above 2%. The daily new-chat cap halves, and Slack gets an alert.
 - **Red:** the provider says blocked, 5 failures in a row, or delivery under 70%. No new leads on the line, its chats move to the next channel, and Slack and the customer are told. The ops on-call replaces the line within one working day.
-- A replacement line starts its warm-up again, so with one line per store, the store is back to 10 new chats a day for 2–3 weeks. More of its leads go the campaign's way meanwhile.
+- A replacement line starts its warm-up again, so with one line per store, the store is back to 10 new chats a day for 2–3 weeks. More of its leads get the campaign as usual meanwhile.
 - A weekly Slack summary per line catches slow decline.
 
 ## C. Android
@@ -223,7 +223,7 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 
 **Full build after a go (4 weeks, one engineer)**
 - **Replies first (diagram C), weeks 1–2:** provider interface, webhooks with the catch-up job, STOP handling, chat rules (typing dots, 15 s wait, a cap of 30), content check.
-- **Then sending (diagram B), weeks 3–4:** the channel check before writing, the fallback message plus an iMessage version, iMessage steps with their fallback, per-line limits, no-link rules, health alerts, the random split.
+- **Then sending (diagram B), weeks 3–4:** the channel check before writing, the iMessage message, iMessage text steps, failures reported to the AI, per-line limits, no-link rules, health alerts, the random split.
 - **SMS-only code:** if the shared send check sits inside the SMS code, we pull it out first, about one more week.
 - The test module keeps running meanwhile, so the 3 stores don't lose iMessage.
 
@@ -243,7 +243,7 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 **Waits in v1, and why:**
 - **Self-serve and billing:** needs pilot numbers first.
 - **More than one line per store:** needs line choice and pinning each lead to one line. One line fits the pilot.
-- **Waiting for a free slot:** in v1, no slot on line X hands the step back at once, like every other "no". If the pilot shows many such hand-backs (for example, when sending hours open), we add a short wait for the next slot, at most an hour.
+- **Waiting for a free slot:** in v1, no slot on line X tells the AI at once, like every other "no". If the pilot shows many of these (for example, when sending hours open), we add a short wait for the next slot, at most an hour.
 - **Moving a chat to a new line:** the next channel covers it in v1.
 - **Sending pictures:** not needed to win a reply.
 - **Group chats:** carts are one-to-one.
@@ -267,7 +267,7 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 4. Do the contact-hour and frequency controls already cover state rules (FL, MD, OK, TX)? Do they apply to AI replies? **If not:** pilot campaigns keep the default 9–17, Mon–Fri, which fits every state rule we found (section E), and C checks legal hours for AI replies.
 5. Where is consent stored?
 6. Is there a common channel interface? **If not:** before the full build we pull the shared send check out of the SMS code, about one more week (the "SMS-only code" risk).
-7. Does the AI write a step's message ahead, or when it's due? We plan to write the fallback message plus an iMessage version ahead, after the iMessage check. **If it writes when due:** it writes both then. That's one more AI call per send; diagram B stays the same.
+7. When an SMS fails today, does the AI get it and pick the next step? We assume so, from the flow in the brief. **If not:** iMessage failures go wherever failed SMS go today.
 8. Before the AI writes, does Outcraft check which channels a lead can get? **If yes:** iMessage joins that check. **If not:** we add one step before writing, the channel check.
 9. What share of our stores' shoppers use iPhones?
 10. Have you looked at RCS for Business?
