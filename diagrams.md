@@ -4,7 +4,7 @@ Back to the plan: [README.md](README.md)
 
 **Why B and C:** messages leave a number and replies come back only in these two, so most failures happen here. A is manual in v1, and D is covered by the plan's section 3.
 
-**Where this sits in Outcraft's flow:** lead joins a campaign → before each text step, the **iMessage check** → the AI writes the fallback message as usual, plus an iMessage version if the lead can get it → scheduler: step is due → **B**, only for leads who passed: send-time checks, then iMessage from line X, or the fallback → **C:** statuses and replies → AI answers. Leads who can't get iMessage get the campaign as usual.
+**Where this sits in Outcraft's flow:** lead joins a campaign → before each iMessage step, the **iMessage check** → the AI writes the fallback message as usual, plus an iMessage version if the lead can get it → scheduler: step is due → **B**, only for leads who passed: send-time checks, then iMessage from line X, or the fallback → **C:** statuses and replies → AI answers. Leads who can't get iMessage get the campaign as usual.
 
 **How to read:**
 - 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 fallback: the campaign sends it its usual way, never from line X · 🟪 purple border: new for iMessage; grey border: already exists, shared with SMS
@@ -14,8 +14,8 @@ Back to the plan: [README.md](README.md)
 - **Who does it:** our app, the scheduler, the queue, the AI, the provider, or the lead's phone.
 - **Line X** is the store's iMessage line: one per store in v1, like its one SMS number. Every iMessage to the store's leads comes from it.
 - **iMessage switches:** one for everyone on Outcraft (our team, or the circuit breaker when the provider is down), one per store (our admins), one per campaign. All three must be on.
-- **Which steps:** iMessage is a fifth channel. A text step is an SMS step or an iMessage step. A campaign can add iMessage steps, each with a fallback the campaign sets (SMS or a call). For a lead on iMessage, SMS steps also go from line X. One number per lead: after a fallback, the lead's next steps run as usual.
-- **Fallback message:** what the campaign sends without iMessage. For an SMS step, it's the SMS the AI writes as usual. For an iMessage step, it's the message for its fallback channel (nothing to write for a call). The AI also writes an iMessage version.
+- **Which steps:** iMessage is a fifth channel. In a campaign with iMessage on, every text step is an iMessage step, with a fallback the campaign sets (SMS or a call). So a lead never gets SMS and iMessage from two numbers. One number per lead: after a fallback, the lead's next steps run as usual.
+- **Fallback message:** what the campaign sends without iMessage: the message for the step's fallback channel, which the AI writes as usual (nothing to write for a call). The AI also writes an iMessage version.
 - **What B leaves to the existing system:** sending hours, state legal hours and the frequency cap (the scheduler fires the step inside them); reply, purchase and opt-out (the campaign's shared check, the same one SMS uses, run again at send time). B adds only the iMessage on-switch and line X's limits.
 - **Legal hours in C:** live replies skip the scheduler, so C checks legal hours itself, with the same rule. It checks before the AI writes, so no answer waits for hours and goes out stale.
 - **Checks in two places:** the full iMessage check runs before writing. At send time, the campaign's shared check and the on-switch run again, so nothing stale goes out. If the check, or the lookup, fails, the lead gets the campaign as usual.
@@ -30,8 +30,8 @@ Back to the plan: [README.md](README.md)
 ## B. Sending a message: a step is due for an iMessage lead, up to the message leaving a number (or not)
 
 **Before B, when the AI writes the step** (not drawn, it's one check):
-1. **iMessage check:** iMessage on for the store and the campaign, a US/CA number, texting consent, not opted out, passes Do Not Call, not in FL, MD or OK during the pilot, the lookup says iMessage (cached 30 days), the iMessage group of the pilot, no fallback earlier in this campaign, and fewer than 2 unanswered iMessages. Any error, timeout or unknown means no.
-2. **The AI writes the fallback message** as usual (for an iMessage step: the message for its fallback channel, none for a call). If the check passed, it also writes an **iMessage version**: a short question with no link until the lead has written to our line, then the full message.
+1. **iMessage check** (joins today's channel check if there is one): iMessage on for the store and the campaign, a US/CA number, texting consent, not opted out, passes Do Not Call, not in FL, MD or OK during the pilot, the lookup says iMessage (cached 30 days), the iMessage group of the pilot, no fallback earlier in this campaign, and fewer than 2 unanswered iMessages. Any error, timeout or unknown means no.
+2. **The AI writes the fallback message** as usual (the message for the step's fallback channel, none for a call). If the check passed, it also writes an **iMessage version**: a short question with no link until the lead has written to our line, then the full message.
 3. **Both pass our content check,** or the AI rewrites them once. Still failing: nothing is sent, and the team is alerted.
 
 **Leads who fail the check** (Android, no consent, outside the pilot group) get only the usual message. The step runs as usual and never enters B.
