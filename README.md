@@ -2,56 +2,56 @@
 
 Tadas Vinckas · [Diagrams](diagrams.md)
 
-In short: iMessage could win more replies from iPhone shoppers, but it costs 20× more than SMS and Apple can ban a line. So we test before we build. First we count how many shoppers are on iMessage, and stop if there are too few. Then a small module sends iMessages in 3 stores, answers replies with the cart link, and counts who buys. Unless a line gets flagged or shoppers opt out more than on SMS, it keeps running, and in week 7 we decide on recovered carts: 2 more in 100 if lines run at full speed, about 6 if they're held back. Only then do we build it properly.
+In short: iMessage could get more iPhone shoppers to reply and buy, but it costs about 20 times more than SMS, and Apple can block a number that looks like spam. So we test before we build. First we check that enough shoppers use iMessage. Then a small test in three stores counts who buys. After seven weeks we decide whether it wins enough extra carts to pay for itself. Only then do we build it properly.
 
 ## 1. Provider: which one, and why
 
-- **Today:** no provider yet. Five compared: Blooio, Linq, Sendblue, Photon, own Macs.
-- **Suggestion: Blooio** for the test and the pilot, with a data agreement and minimal shopper data.
-- **Why Blooio:** it refuses sends that break its rules (a link before a reply, too many unanswered messages), so a bug in our code costs one message, not a banned line. Self-serve, known price.
-- **Not Linq yet:** it only warns, leaving pausing to us. Plan B if replies stay under 40%.
-- **Not Sendblue:** it sells its own iMessage cart recovery to stores, and had a 2026 breach.
+- **Today:** no provider yet. I compared five, from Blooio to running our own Macs.
+- **Suggestion: Blooio**, for the test and the pilot. We share only the shopper data a message needs.
+- **Why:** Blooio blocks messages that break its rules, like a link before the shopper has replied. So a bug on our side costs one message, not a blocked number.
+- **Not Linq for now:** it only warns us and leaves stopping to us. It's our backup if Blooio's rules hold us back.
+- **Not Sendblue:** it sells its own cart recovery to stores, so it competes with us. It also had a data breach in 2026.
 
-## 2. Risks: what breaks at volume, and what we do
+## 2. Risks: what can go wrong, and what we do
 
-| Risk | Why it matters: what breaks | Suggestion: what we do |
+| Risk | What can go wrong | What we do |
 |---|---|---|
-| **Apple blocks a line** | Junk reports or bursts block the number. Its chats drop. | New chats ramp 10 → 25 → 50 a day. Consent only, no nights. |
-| **Two numbers** | SMS and iMessage share one app. A second store number looks like a scam. | One number per shopper. A chat moved to SMS says "same store". |
-| **No link before a reply** | iPhones disable links from strangers. | A short question first, the link after a reply. |
-| **Few replies** | One-way lines look like bots. Under 40% replies, Blooio holds a line to 10 new chats a day. | The first message asks a question. Under 40%: 10 a day, or Linq. |
-| **One bad store** | It can get our whole Blooio account closed. | Admins check what a store sells first. If its line goes wrong, it switches off automatically. |
-| **STOP and state law** | No carrier catches STOP. Some states limit hours. | We catch STOP; SMS law checks apply. |
-| **Cost** | $0.20 a lead, against $0.01 for SMS. | It pays off for us at about 15 more carts per 1,000 leads; 4× that if a line is held to 10 a day. |
+| **Apple blocks a number** | Spam reports or sudden bursts get it blocked, and its chats stop. | New numbers start slowly. Only shoppers who agreed to texts, never at night. |
+| **Two numbers** | Texts and iMessages share one app. A second store number looks like a scam. | Each shopper hears from one number. If a chat moves to SMS, it says it's the same store. |
+| **No link at first** | iPhones turn off links from unknown senders. | The first message asks a short question. The link comes after the reply. |
+| **Few replies** | A number nobody answers looks like a bot, and Blooio slows it down. | The first message invites a reply. If replies stay low: fewer chats, or Linq. |
+| **One bad store** | It could get our whole account closed. | We check what a store sells before turning it on. A number that goes wrong switches off on its own. |
+| **STOP and state law** | No phone carrier handles "STOP" for us. Some states limit sending hours. | We catch STOP ourselves and follow the same rules as SMS. |
+| **Cost** | Each shopper costs about 20 times more than an SMS. | iMessage must win clearly more carts than SMS. The pilot measures that. |
 
-### Edge cases: where iMessage needs other rules than today
+### Edge cases: where iMessage needs different rules
 
 | Edge case | Today | Suggestion | Why |
 |---|---|---|---|
-| **Channel check** | Lead data shows which channels work: phone, email. | Before the AI writes, also check: is the number on iMessage? Reuse today's check if there is one. | Only a lookup shows iMessage. |
-| **Message writing** | AI writes, scheduler sends. | Passed the check → an iMessage version too, next to the usual message. | A free slot is known only at send time. The campaign sets the fallback, so all are written early. |
-| **Follow-ups and calls** | Steps and calls run on schedule. | A reply or purchase cancels them. No calls mid-chat. | No "still thinking?" after "yes, buying". |
+| **Channel check** | The lead's profile shows which channels work, like phone or email. | Before the AI writes, also check for iMessage, inside today's check if there is one. | Only a lookup can tell. |
+| **Message writing** | The AI writes, then the scheduler sends. | If the lead has iMessage, the AI also writes an iMessage version. | We only know at send time whether iMessage works, so both versions are ready. |
+| **Follow-ups and calls** | Steps and calls run on schedule. | A reply or a purchase cancels them. No calls during a chat. | No "still thinking?" after "yes, I'm buying". |
 
-## 3. Line health: how the team learns without a dashboard
+## 3. Number health: how the team knows without a dashboard
 
-- **Suggestion:** every 15 minutes a job checks each line. Weak (low delivery, many opt-outs): half the new chats, Slack alert. Blocked: no new chats, Slack alert, on-call replaces it within a day.
+- **Suggestion:** a job checks every number often. A weak one (messages not arriving, many shoppers asking to stop) starts fewer chats, and Slack tells the team. A blocked one stops and is replaced within a day.
 
 ## 4. Who turns it on: our admins, every store, or a plan
 
-- **Today:** each campaign switches its channels on: calls, SMS, email, WhatsApp.
-- **Suggestion:** our admins only in v1. Not every store in its settings yet: a line needs warm-up and a content check, and one bad store can get us all banned. Not tied to a plan yet: the pilot first shows what it's worth. Later, a paid add-on per line.
+- **Today:** each campaign turns its own channels on: calls, SMS, email, WhatsApp.
+- **Suggestion:** only our admins, at first. Not every store yet: a new number needs a slow start and a content check, and one bad store could get everyone blocked. Not tied to a plan yet: the pilot first shows what it's worth. Later, it can be a paid add-on.
 
 ## 5. Which leads get it, and what happens to the rest
 
-- **Suggestion:** only leads whose number is on iMessage, looked up where it is on.
-- **One number per lead:** SMS and iMessage share one app. So with iMessage on, a campaign's text steps are iMessage steps, each with a fallback (SMS or a call).
-- **The rest** (Android, no consent, no free slot): the campaign as usual. We log why.
+- **Suggestion:** only leads whose phone has iMessage. We check only where iMessage is turned on.
+- **One number per lead:** with iMessage on, the campaign's texts go by iMessage, each with a backup (SMS or a call).
+- **Everyone else** (Android, no consent, number full for the day): the campaign as usual.
 
 ## 6. First version and time
 
 - **Suggestion: test first, build after.**
-  1. **Week 1:** count shoppers on iMessage, and stop if there are too few. Sign Blooio, give stores the required 10 days' notice, build a small test (3 days).
-  2. **Day 11:** the test goes live in 3 stores. Shoppers get one question; a reply gets the cart link. We count who replies and who buys.
-  3. **Week 3:** stop if a line gets flagged or shoppers opt out more than on SMS. Otherwise keep going.
-  4. **Week 7:** decide. Go if iMessage recovers 2 more carts per 100. Then build the full version on top of the test: 1–2 weeks, one engineer.
-- **Cost until the decision:** 3 Blooio lines, about $1,730.
+  1. **Week 1:** check that enough shoppers use iMessage. Sign Blooio, give stores the required notice, and build a small test.
+  2. **Week 2:** the test starts in three stores. Shoppers get one question, and a reply gets the cart link. We count who replies and who buys.
+  3. **Week 3:** stop if a number gets blocked or shoppers ask us to stop more than on SMS. Otherwise keep going.
+  4. **Week 7:** decide. Go if iMessage wins about 2 more carts per 100 shoppers. Then one engineer builds the full version on top of the test, in a week or two.
+- **Cost until the decision:** about $1,730 for three numbers.
