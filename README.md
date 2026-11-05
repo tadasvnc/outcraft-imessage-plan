@@ -53,5 +53,5 @@ In short: iMessage could win more replies from iPhone shoppers, but it costs 20Ã
   1. **Week 1:** count shoppers on iMessage, and stop if there are too few. Sign Blooio, give stores the required 10 days' notice, build a small test (3 days).
   2. **Day 11:** the test goes live in 3 stores. Shoppers get one question; a reply gets the cart link. We count who replies and who buys.
   3. **Week 3:** stop if a line gets flagged or shoppers opt out more than on SMS. Otherwise keep going.
-  4. **Week 7:** decide. Go if iMessage recovers 2 more carts per 100. Then build the full version: 4 weeks, one engineer.
+  4. **Week 7:** decide. Go if iMessage recovers 2 more carts per 100. Then build the full version on top of the test: 1â€“2 weeks, one engineer.
 - **Cost until the decision:** 3 Blooio lines, about $1,730.
