@@ -2,7 +2,7 @@
 
 Tadas Vinckas · [Diagrams](diagrams.md)
 
-In short: iMessage could win more replies from iPhone shoppers, but it costs 20× more than SMS and Apple can ban a line. So we test before we build. First we count how many shoppers are on iMessage, and stop if there are too few. Then a small script sends iMessages in 3 stores, and support answers by hand. If replies double, one engineer spends a week adding the must-haves (automatic STOP, counting recovered carts), and we run it 3 more weeks. In week 8 we decide whether it recovers 2 more carts in 100. Only then do we build it properly.
+In short: iMessage could win more replies from iPhone shoppers, but it costs 20× more than SMS and Apple can ban a line. So we test before we build. First we count how many shoppers are on iMessage, and stop if there are too few. Then a small test module sends iMessages in 3 stores and answers replies with the cart link. If replies double, one engineer spends a week adding what the pilot needs (counting recovered carts, line alerts), and we run it 3 more weeks. In week 8 we decide whether it recovers 2 more carts in 100. Only then do we build it properly.
 
 ## 1. Provider: which one, and why
 
@@ -66,12 +66,12 @@ In short: iMessage could win more replies from iPhone shoppers, but it costs 20�
 - **Today:** iMessage isn't built yet (the site lists it: question 1).
 - **Suggestion: test first, build after.**
   - **Week 1, count:** carts a day with consent, times each store's iPhone share. Pick 3 stores. Contract, data agreement, vendor notice.
-  - **Weeks 2–3, test:** a throwaway script sends a fixed iMessage to random iPhone carts in 3 stores, a line each. Their campaign texts pause; the rest get the campaign as usual. Support answers by hand. The lines warm up meanwhile.
+  - **Weeks 2–3, test:** a small module in our app (about 2 days of work) sends a fixed iMessage to random iPhone carts in 3 stores, a line each. Their campaign texts pause; the rest get the campaign as usual. A reply gets the cart link and the store's support email; STOP opts out. Nobody answers by hand. The lines warm up meanwhile.
   - **End of week 3:** 2× replies, no flag → go on. Flagged → retry slower, after missed calls. Else stop.
-  - **Week 4, one week of build:** automatic STOP, recovered carts counted per group, Slack alerts.
+  - **Week 4, one week of build:** recovered carts counted per group, Slack alerts on line warnings.
   - **Weeks 5–7, pilot:** the same setup on warm lines, until about 2,560 shoppers have had iMessage. Decision in week 8.
-- **After a go, the full build (4 weeks, one engineer), in order:** replies (diagram C): webhooks, AI answers and STOP, live before the first send. Then sending (diagram B): channel check, versions, line limits, alerts.
-- **Why this order:** nothing is built before shoppers reply, and only one week before we know they buy. Lines: 3, about $1,730 up to the decision.
+- **After a go, the full build (4 weeks, one engineer)** replaces the test module and adds what it leaves out: AI writing and chat, fallbacks, retries, the health job. In order: replies (diagram C), live before the first send, then sending (diagram B).
+- **Why this order:** only the 2-day test module is built before shoppers reply, and one more week before we know they buy. Lines: 3, about $1,730 up to the decision.
 - **Why 8 weeks:** the vendor notice (10 days), the warm-up (3 weeks) and the pilot (3 weeks) set it, not the build.
 - **Blocks us:** data agreement, vendor notice, consent. **Could slip:** bans, stores with too few leads.
 - **What waits:** more lines per store, self-serve and billing, a dashboard (Slack does it), photos, a second provider, countries beyond US/CA.

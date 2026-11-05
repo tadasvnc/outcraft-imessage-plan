@@ -164,7 +164,7 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 | Weeks | Phase | The question it answers |
 |---|---|---|
 | 1 | **Count** and paperwork | Are there enough eligible shoppers? |
-| 2–3 | **Test:** a script sends, support answers by hand | Do they reply? |
+| 2–3 | **Test:** a small module sends fixed messages; replies get the cart link | Do they reply? |
 | 4 | **One week of build** for the pilot | — |
 | 5–7 | **Pilot:** a random group of iPhone shoppers gets iMessage | Does adding iMessage recover more carts? |
 | 8 | **Decision** | Go or no-go |
@@ -175,24 +175,34 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 **Step 0: count and test (weeks 1–3, no build)**
 - **Week 1:** provider contract, data agreement (DPA), legal check on state rules. Blooio goes on Outcraft's sub-processor list on day 1, because that must be 10 days before any shopper data reaches it (Outcraft's DPA, clause 7.4.3).
 - **Count the eligible shoppers** (a few days): carts with consent and a US/CA number, times each store's iPhone share from its analytics. A lookup on about 500 numbers confirms it once the notice has run. Pick 3 stores.
-- **Three-line test, from about day 11:** 3 stores, one Blooio line each, which go on into the pilot. A throwaway script (about a day of work) takes the store's abandoned-cart event, checks consent, a US/CA number and 9:00–17:00 local time, asks Blooio whether the number is on iMessage, and sends one fixed message to a random group of iPhone carts, up to the line's daily cap (10 a day at first, about 40 after 3 weeks). Their campaign texts pause, so nobody hears from two numbers. The rest get the campaign as usual. Replies go to a Slack channel, and a support person answers in Blooio's dashboard with AI drafts, about an hour a day.
+- **Three-line test, from about day 11:** 3 stores, one Blooio line each, which go on into the pilot. A small module inside our app, behind an on/off switch (about 2 days of work), takes the store's abandoned-cart event. It checks consent, a US/CA number, not opted out, Do Not Call, not in FL, MD or OK, and 9:00–17:00 local time. It asks Blooio whether the number is on iMessage, and sends a fixed message to a random group of iPhone carts, up to the line's daily cap (10 a day at first, about 40 after 3 weeks). Once Blooio accepts the message, the shopper's campaign texts pause, so nobody hears from two numbers. The rest get the campaign as usual.
+- **Four fixed messages, nobody answers by hand:**
+  1. **First message:** "Hi Sam, this is the Glow Shop assistant. You left the blue scarf in your cart. Want me to save it for you?"
+  2. **The shopper replies:** "Here's your cart: [link]. Questions? The Glow Shop team is at [store's support email]."
+  3. **The shopper writes again,** once only: "Thanks! The Glow Shop team can help at [email]."
+  4. **STOP and similar words:** the shopper is opted out on all of the store's channels through Outcraft's existing opt-out code, with one confirmation. Unclear cases ("please stop texting me") count as STOP.
+- Every reply is saved, so we can read what shoppers ask.
 - **Check at the end of week 3:** go on if a store has at least ~30 eligible shoppers a day, replies are at least 2× the rest, and no line is flagged.
 - **If cold messages get a line flagged:** one more try on a new line, with a slower ramp, and iMessage only right after a missed call, when the shopper has just heard from the brand. That store joins the pilot later. Flagged again → stop.
 - **Otherwise stop**, or look at RCS.
 
 **One week of build (week 4)**
-- The test setup stays: the script sends, support answers with AI drafts. One engineer adds what a 3-week run needs:
-  - STOP and similar words opt the lead out on all of the store's channels automatically, with one confirmation;
+- The test module stays as it is. One engineer adds what a 3-week run needs:
   - recovered carts counted for each group;
   - a Slack alert on Blooio's safety webhook.
-- The script is deleted once the full build replaces it.
+- The module is switched off and deleted once the full build replaces it.
+
+**The module against diagrams B and C**
+- **Kept from B:** the checks before a first message, the iMessage lookup, the random group, the line's daily and hourly cap, our message id against double sends. If Blooio refuses a send, the shopper simply stays on the campaign.
+- **Kept from C:** the reply webhook with its signature check and repeat skipping, automatic STOP, the two fixed answers.
+- **Waits for the full build:** AI writing and AI chat (typing dots, the 15 s wait, the 30-reply cap, handoff to a person), the fallback after a failed delivery (rare after the lookup, so only counted), retries, the health job and circuit breaker, the catch-up job, legal hours for replies (FL, MD and OK stay out of the test), iMessage steps and switches in campaigns.
 
 **Pilot (weeks 5–7)**
 - 3 US stores, one line each, switched on by our admins. We pay for the lines.
 - The lines are warm from step 0, so each takes about 40 new chats a day from day one.
 - A random split among iPhone shoppers only, sized to each store's line: about 40 a day get iMessage, the rest the campaign without it (section G).
-- Support answers replies with AI drafts, a few hours a day. People may answer better than the AI will, so the pilot can flatter iMessage a little.
-- **We measure:** replies, recovered carts, opt-outs, blocked lines, support time per chat, lookup accuracy.
+- Replies get the same fixed answers as in the test. A real AI chat would also answer questions in the thread, so the pilot slightly understates iMessage. That's the safe direction: if a plain link wins, the full product should do better.
+- **We measure:** replies, recovered carts, opt-outs, blocked lines, lookup accuracy, and what shoppers ask.
 
 **Decision (week 8)**, once the last pilot carts have had a few days to buy.
 - **Go if**, against iPhone shoppers without iMessage: replies at least 2×, recovery at least 2 points higher, opt-outs no higher, and under 1 blocked line per 10 line-months (section G).
