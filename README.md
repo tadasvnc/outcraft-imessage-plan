@@ -22,7 +22,7 @@ In short: iMessage could win more replies from iPhone shoppers, but it costs 20�
 | **No link before a reply** | iPhones disable links from strangers. | A short question first, the link after a reply. |
 | **Lead not on iMessage** | About 4 in 10 US phones are Android. | We look it up first. Not on iMessage → the campaign as usual. |
 | **Few replies** | One-way lines look like bots. Under 40% replies, Blooio holds a line to 10 new chats a day. | The first message asks a question. Under 40%: 10 a day, or Linq. |
-| **One bad store** | It can get our account closed. | Admin check, a sub-account per store. |
+| **One bad store** | It can get our whole Blooio account closed. | Admins check what a store sells first. If its line goes wrong, it switches off automatically. |
 | **STOP and state law** | No carrier catches STOP. Some states limit hours. | We catch STOP; SMS law checks apply. |
 | **Cost** | $0.20 a lead, against $0.01 for SMS. | It pays off for us at about 15 more carts per 1,000 leads; 4× that if a line is held to 10 a day. |
 
