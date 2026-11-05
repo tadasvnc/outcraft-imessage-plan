@@ -25,7 +25,6 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
 | **Same first message** | Blooio restricts every number when half our first messages start the same way. | Each first message is personal: store, product, varied wording. |
 | **One bad store** | It could get our whole account closed. | We check what a store sells before turning it on. A number that goes wrong switches off on its own. |
 | **STOP and state law** | No phone carrier handles "STOP" for us. Some states limit sending hours. | We catch STOP ourselves and follow the same rules as SMS. |
-| **Cost** | Each shopper costs about 20 times more than an SMS. | iMessage must win clearly more carts than SMS. The pilot measures that. |
 
 ### Edge cases: where iMessage needs different rules
 
