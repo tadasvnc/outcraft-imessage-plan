@@ -14,6 +14,7 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
   - **Early warning:** it tells us when a number is at risk, so we can slow down.
 - **Not Linq for now:** it only warns and leaves stopping to us. It's our backup.
 - **Not Sendblue:** it sells cart recovery to stores, so it competes with us. And a 2026 data breach.
+- **Not our own Macs:** every ban and every machine would be ours to handle, and nothing would catch our mistakes. One AI company (Lindy) was banned within half a day on its own setup.
 
 ## 2. Risks: what can go wrong, and what we do
 
@@ -36,7 +37,9 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
 
 ## 3. Number health: how the team knows without a dashboard
 
-- **Suggestion:** Slack tells the team when a number goes wrong. No extra job is needed: we check the number with every message. A blocked number stops at once and is replaced within a day.
+- **Suggestion:** Slack tells the team when a number goes wrong.
+  - **How we notice:** we check the number with every message, so no separate job is needed.
+  - **What happens:** a blocked number stops at once and is replaced within a day.
 
 ## 4. Who turns it on: our admins, every store, or a plan
 
