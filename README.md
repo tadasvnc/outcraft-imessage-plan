@@ -2,7 +2,7 @@
 
 Tadas Vinckas · [Diagrams](diagrams.md)
 
-In short: iMessage could get more iPhone shoppers to reply and buy, but it costs about 20 times more than SMS, and Apple can block a number that looks like spam. So we test before we build. First we check that enough shoppers use iMessage. Then a small test in three stores counts who buys. If too few shoppers reply, Blooio slows us down, and it may not pay off. After seven weeks we decide whether it wins enough extra carts to pay for itself. Only then do we build it properly.
+In short: iMessage could get more iPhone shoppers to reply and buy, but it costs about 20 times more than SMS, and Apple can block a number that looks like spam. So we test before we build. First we check that enough shoppers use iMessage. Then a small test in three stores counts who buys. If too few shoppers reply, it may not pay off. After seven weeks we decide whether it wins enough extra carts to pay for itself. Only then do we build it properly.
 
 ## 1. Provider: which one, and why
 
