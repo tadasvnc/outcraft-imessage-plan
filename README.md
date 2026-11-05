@@ -2,12 +2,12 @@
 
 Tadas Vinckas · [Diagrams](diagrams.md)
 
-In short: iMessage could get more iPhone shoppers to reply and buy, but it costs about 20 times more than SMS, and Apple can block a number that looks like spam. So we test before we build. First we check that enough shoppers use iMessage. Then a small test in three stores counts who buys. After seven weeks we decide whether it wins enough extra carts to pay for itself. Only then do we build it properly.
+In short: iMessage could get more iPhone shoppers to reply and buy, but it costs about 20 times more than SMS, and Apple can block a number that looks like spam. So we test before we build. First we check that enough shoppers use iMessage. Then a small test in three stores counts who buys. If too few shoppers reply, Blooio slows us down, and it may not pay off. After seven weeks we decide whether it wins enough extra carts to pay for itself. Only then do we build it properly.
 
 ## 1. Provider: which one, and why
 
 - **Today:** no provider yet. I compared five, from Blooio to running our own Macs.
-- **Suggestion: Blooio**, for the test and the pilot. We share only the shopper data a message needs.
+- **Suggestion: Blooio**, for the test and the pilot.
 - **Why:** Blooio blocks messages that break its rules, like a link before the shopper has replied. So a bug on our side costs one message, not a blocked number.
 - **Not Linq for now:** it only warns us and leaves stopping to us. It's our backup if Blooio's rules hold us back.
 - **Not Sendblue:** it sells its own cart recovery to stores, so it competes with us. It also had a data breach in 2026.
