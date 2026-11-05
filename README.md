@@ -2,7 +2,7 @@
 
 Tadas Vinckas · [Diagrams](diagrams.md)
 
-In short: iMessage could get more iPhone shoppers to reply and buy, but it costs about 20 times more than SMS, and Apple can block a number that looks like spam. So we test before we build. First we check that enough shoppers use iMessage. Then a small test in three stores counts who buys. If too few shoppers reply, it may not pay off. After seven weeks we decide whether it wins enough extra carts to pay for itself. Only then do we build it properly.
+In short: iMessage could get more iPhone shoppers to reply and buy, but it costs about 20 times more than SMS, and Apple can block a number that looks like spam. So we test before we build. First we check that enough shoppers use iMessage. Then a small test in three stores counts who buys. If too few shoppers reply, it may not pay off. After seven weeks we decide whether it wins enough extra carts to pay for itself.
 
 ## 1. Provider: which one, and why
 
@@ -21,8 +21,8 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
 |---|---|---|
 | **Apple blocks a number** | Spam reports or sudden bursts get it blocked, and its chats stop. | New numbers start slowly. Only shoppers who agreed to texts, never at night. |
 | **Two numbers** | Texts and iMessages share one app. A second store number looks like a scam. | Each shopper hears from one number. If a chat moves to SMS, it says it's the same store. |
-| **No link at first** | iPhones turn off links from unknown senders. | The first message asks a short question. The link comes after the reply. |
-| **Few replies** | A number nobody answers looks like a bot, and Blooio slows it down. | The first message invites a reply. If replies stay low: fewer chats, or Linq. |
+| **First message** | iPhones turn off links from unknown senders, and a number nobody answers looks like a bot. | A short question first, the link after the reply. If replies stay low: fewer chats, or Linq. |
+| **Same first message** | Blooio restricts every number when half our first messages start the same way. | Each first message is personal: store, product, varied wording. |
 | **One bad store** | It could get our whole account closed. | We check what a store sells before turning it on. A number that goes wrong switches off on its own. |
 | **STOP and state law** | No phone carrier handles "STOP" for us. Some states limit sending hours. | We catch STOP ourselves and follow the same rules as SMS. |
 | **Cost** | Each shopper costs about 20 times more than an SMS. | iMessage must win clearly more carts than SMS. The pilot measures that. |
@@ -32,14 +32,12 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
 | Edge case | Today | Suggestion | Why |
 |---|---|---|---|
 | **Channel check** | The lead's profile shows which channels work, like phone or email. | Before the AI writes, also check for iMessage, inside today's check if there is one. | Only a lookup can tell. |
-| **Calls instead of replying** | Not clear how it works: does the AI answer a call back to the number that texted? Asked the team. | Blooio forwards calls on the iMessage number to the store's support number. AI calls show the iMessage number. | One number for chat and calls. A number that doesn't answer loses the lead. |
+| **Calls instead of replying** | Unclear: does the AI answer a call back? Asked the team. | Blooio forwards calls on the iMessage number to the store's support number. AI calls show the iMessage number. | One number for chat and calls. A number that doesn't answer loses the lead. |
 | **Still typing** | The AI answers each message. | Wait a few seconds after the last message, with typing dots, then answer once. | People type in short bursts. Many answers look like a bot. |
 
 ## 3. Number health: how the team knows without a dashboard
 
-- **Suggestion:** Slack tells the team when a number goes wrong. No extra job is needed: diagrams B and C check the number with every message.
-  - **Weak:** it starts fewer chats.
-  - **Blocked:** it stops at once and is replaced within a day.
+- **Suggestion:** Slack tells the team when a number goes wrong. No extra job is needed: we check the number with every message. A blocked number stops at once and is replaced within a day.
 
 ## 4. Who turns it on: our admins, every store, or a plan
 
@@ -56,6 +54,6 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
 
 - **Suggestion: test first, build after.** Three Blooio numbers cost about $1,730 until the decision.
   1. **Week 1:** check that enough shoppers use iMessage. Sign Blooio, give stores the required notice, and build a small test.
-  2. **Week 2:** the test starts in three stores: one question, then the cart link after a reply. We count who buys.
+  2. **Week 2:** the test starts in three stores: a short, personal question, then the cart link after a reply. We count who buys.
   3. **Week 3:** stop if a number gets blocked or shoppers ask us to stop more than on SMS. Otherwise keep going.
   4. **Week 7:** decide. Go if iMessage wins about 2 more carts per 100 shoppers, then build the full version in a week or two.
