@@ -10,7 +10,7 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
 - **Suggestion: Blooio**, for the test and the pilot.
 - **Why:**
   - **Safe:** it blocks messages that break its rules, like a link before a reply. A bug on our side costs one message, not a blocked number.
-  - **Fast to start:** a public price, no setup fee, live in days.
+  - **Fast to start:** $289 a month per number, no setup fee, live in days.
   - **Early warning:** it tells us when a number is at risk, so we can slow down.
 - **Not Linq for now:** it only warns and leaves stopping to us. It's our backup.
 - **Not Sendblue:** it sells cart recovery to stores, so it competes with us. And a 2026 data breach.
@@ -55,4 +55,4 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
   1. **Week 1:** check that enough shoppers use iMessage. Sign Blooio, give stores the required notice, and build a small test.
   2. **Week 2:** the test starts in three stores: a short, personal question, then the cart link after a reply. We count who buys.
   3. **Week 3:** stop if a number gets blocked or shoppers ask us to stop more than on SMS. Otherwise keep going.
-  4. **Week 7:** decide. Go if iMessage wins about 2 more carts per 100 shoppers, then build the full version in a week or two.
+  4. **Week 7:** decide. Go if iMessage wins about 2 more carts per 100 shoppers, enough to pay for the numbers. Then build the full version in a week or two.
