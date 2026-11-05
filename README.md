@@ -7,14 +7,12 @@ In short: iMessage could win more replies from iPhone shoppers, but it costs 20�
 ## 1. Provider: which one, and why
 
 - **Today:** no provider yet. Five compared in appendix A: Blooio, Linq, Sendblue, Photon, own Macs.
-- **Suggestion: Blooio** for step 0 and the pilot, with a data agreement and minimal shopper data.
+- **Suggestion: Blooio** for the test and the pilot, with a data agreement and minimal shopper data.
 - **Why Blooio:** it refuses sends that break its rules (a link before a reply, too many unanswered messages), so a bug in our code costs one message, not a banned line. Self-serve, known price.
-- **Not Linq yet:** it only warns and leaves pausing to us. It's bigger, so we compare again at scale.
+- **Not Linq yet:** it only warns and leaves pausing to us. Plan B if replies stay under 40%, since it doesn't hold lines back. We compare again at scale.
 - **Not Sendblue:** it competes with us, selling iMessage cart recovery to stores. And a 2026 breach.
 
 ## 2. Risks: what breaks at volume, and what we do
-
-- **Today:** SMS carriers handle STOP and spam. iMessage has none, so these risks are ours.
 
 | Risk | Why it matters: what breaks | Suggestion: what we do |
 |---|---|---|
@@ -23,10 +21,10 @@ In short: iMessage could win more replies from iPhone shoppers, but it costs 20�
 | **Failed iMessage** | A failed message waits while the cart goes cold. | Fallback at once. No delivery status → no resend; next steps as usual. |
 | **No link before a reply** | iPhones disable links from strangers. | A short question first, the link after a reply. |
 | **Lead not on iMessage** | About 4 in 10 US phones are Android. | We look it up first. Not on iMessage → the campaign as usual. |
-| **Few replies** | One-way lines look like bots. | The first message asks a question. Replies halve → no new chats. |
+| **Few replies** | One-way lines look like bots. Under 40% replies, Blooio holds a line to 10 new chats a day. | The first message asks a question. Under 40%: 10 a day, or Linq. |
 | **One bad store** | It can get our account closed. | Admin check, a sub-account per store. |
 | **STOP and state law** | No carrier catches STOP. Some states limit hours. | We catch STOP; SMS law checks apply. |
-| **Cost** | $0.20 a lead, against $0.01 for SMS. | It pays off for us at about 15 more carts per 1,000 leads. |
+| **Cost** | $0.20 a lead, against $0.01 for SMS. | It pays off for us at about 15 more carts per 1,000 leads; 4× that if a line is held to 10 a day. |
 
 ### Edge cases: where iMessage needs other rules than today
 
@@ -68,7 +66,7 @@ In short: iMessage could win more replies from iPhone shoppers, but it costs 20�
   1. **Week 1, count and set up:** shoppers on iMessage (carts with consent × each store's iPhone share); stop if a store has under ~30 a day. Blooio contract, data agreement, vendor notice on day 1. Pick 3 stores. Build the module (~3 days).
   2. **Day 11, live in 3 stores:** a fixed question; a reply gets the cart link; questions go to the store's email; STOP opts out automatically. Their campaign texts pause; the rest get the campaign as usual. Replies, clicks and purchases are counted per group; line warnings go to Slack.
   3. **End of week 3, checkpoint:** stop only for harm: a line flagged or banned, or opt-outs above SMS. Otherwise the reply rate picks the setup: 40% or more → Blooio at full speed. Under 40% → Blooio held at 10 a day, or Linq at full speed (higher ban risk). A big early lift in carts is a strong go signal.
-  4. **Weeks 4–6, pilot:** the same setup keeps running; the lines reach full speed; about 2,560 shoppers get iMessage.
+  4. **Weeks 4–6, pilot:** the same setup keeps running until enough shoppers have had iMessage: about 2,560 at full speed, about 330 if lines are held at 10 a day.
   5. **Week 7, decision:** go if iMessage recovers 2 more carts per 100 at full speed, or about 6 more if lines were held at 10 a day.
   6. **After a go, the full build (4 weeks, one engineer):** replaces the module and adds AI chat, fallbacks, retries, the health job. Replies (diagram C) go live before sending (diagram B).
 - **Why this order:** only a 3-day module is built before we know shoppers reply and buy. Lines: 3, about $1,730 up to the decision.
