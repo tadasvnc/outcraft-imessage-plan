@@ -2,7 +2,7 @@
 
 Tadas Vinckas · [Diagrams](diagrams.md)
 
-In short: iMessage could win more replies from iPhone shoppers, but it costs 20× more than SMS and Apple can ban a line. So we test before we build: a small script sends iMessages in 3 stores, and support answers by hand. If replies double, one engineer spends a week adding the must-haves (automatic STOP, counting recovered carts), and we run it 3 more weeks. In week 8 we decide whether it recovers 2 more carts in 100. Only then do we build it properly.
+In short: iMessage could win more replies from iPhone shoppers, but it costs 20× more than SMS and Apple can ban a line. So we test before we build. First we count how many shoppers are on iMessage, and stop if there are too few. Then a small script sends iMessages in 3 stores, and support answers by hand. If replies double, one engineer spends a week adding the must-haves (automatic STOP, counting recovered carts), and we run it 3 more weeks. In week 8 we decide whether it recovers 2 more carts in 100. Only then do we build it properly.
 
 ## 1. Provider: which one, and why
 
