@@ -41,7 +41,9 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
 ## 4. Who turns it on: our admins, every store, or a plan
 
 - **Today:** each campaign turns its own channels on: calls, SMS, email, WhatsApp.
-- **Suggestion:** only our admins, at first. Not every store yet: a new number needs a slow start and a content check, and one bad store could get everyone blocked. Not tied to a plan yet: the pilot first shows what it's worth. Later, it can be a paid add-on.
+- **Suggestion:** our admins turn it on, one store at a time.
+  - **Not by stores themselves yet:** each new number needs a slow start and a content check, and one bad store could get everyone blocked.
+  - **Not in a price plan yet:** the pilot first shows what it's worth. Later, it can be a paid add-on.
 
 ## 5. Which leads get it, and what happens to the rest
 
