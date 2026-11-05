@@ -21,7 +21,7 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
 |---|---|---|
 | **Apple blocks a number** | Spam reports or sudden bursts get it blocked, and its chats stop. | New numbers start slowly. Only shoppers who agreed to texts, never at night. |
 | **Two numbers** | Texts and iMessages share one app. A second store number looks like a scam. | Each shopper hears from one number. If a chat moves to SMS, it says it's the same store. |
-| **First message** | iPhones turn off links from unknown senders, and a number nobody answers looks like a bot. | A short question first, the link after the reply. If replies stay low: fewer chats, or Linq. |
+| **First message** | To stop scams, an iPhone won't let shoppers tap a link from a number they haven't saved or replied to. A number that sends a lot but gets few replies looks like a bot. | A short question first, the link after the reply. If replies stay low: fewer chats, or Linq. |
 | **Same first message** | Blooio restricts every number when half our first messages start the same way. | Each first message is personal: store, product, varied wording. |
 | **One bad store** | It could get our whole account closed. | We check what a store sells before turning it on. A number that goes wrong switches off on its own. |
 | **STOP and state law** | No phone carrier handles "STOP" for us. Some states limit sending hours. | We catch STOP ourselves and follow the same rules as SMS. |
@@ -45,9 +45,13 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
 
 ## 5. Which leads get it, and what happens to the rest
 
-- **Suggestion:** only leads whose phone has iMessage. We check only where iMessage is turned on.
+- **Suggestion:** a lead gets iMessage only if all of these are true:
+  - iMessage is on for the store and the campaign;
+  - the lead agreed to texts, hasn't asked us to stop, and isn't on Do Not Call;
+  - the number is from the US or Canada, and the lookup says it has iMessage;
+  - our iMessage number has room for a new chat today.
 - **One number per lead:** with iMessage on, the campaign's texts go by iMessage. If one fails, the AI picks the next step, as after a failed SMS today.
-- **Everyone else** (Android, no consent, number full for the day): the campaign as usual.
+- **The rest** get the campaign as today, without iMessage. We log why.
 
 ## 6. First version and time
 

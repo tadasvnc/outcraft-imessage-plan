@@ -129,6 +129,7 @@ flowchart TD
         Q13 -- no --> R6
         Q13 -- yes --> OUT("<b>Provider</b><br/>the answer leaves line X,<br/>the number the lead wrote to"):::out
         OUT --> PH("<b>Lead's phone</b><br/>answer arrives in<br/>the same thread") --> E11(("<b>End</b>"))
+        N3["<b>Retries like diagram B</b><br/>A temporary error (rate limit, timeout)<br/>is tried again after 10 s, 30 s and 60 s,<br/>never sent twice. Still failing:<br/>the AI picks the next step."]:::note
         N1["<b>Still OK to send?</b><br/>Yes if it's not sent yet, and the lead<br/>hasn't replied, bought or opted out<br/>since it was written. Same check as SMS."]:::note
     end
 
@@ -161,6 +162,7 @@ flowchart TD
     N1 -.- QS
     N2["<b>No status after 15 min?</b><br/>Yes: no 'delivered' or 'failed' came<br/>back for a message we sent.<br/>No: a status or reply we missed,<br/>handled like a webhook."]:::note
     N2 -.- QR
+    N3 -.- R7
 
     classDef note fill:#fffbeb,stroke:#d97706,stroke-width:1px,stroke-dasharray:4 3,color:#1f2328
     classDef start fill:#4f46e5,stroke:#4f46e5,color:#ffffff
