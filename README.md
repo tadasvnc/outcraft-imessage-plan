@@ -31,7 +31,7 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
 | Edge case | Today | Suggestion | Why |
 |---|---|---|---|
 | **Channel check** | The lead's profile shows which channels work, like phone or email. | Before the AI writes, also check for iMessage, inside today's check if there is one. | Only a lookup can tell. |
-| **Calls instead of replying** | Unclear: does the AI answer a call back? Asked the team. | Blooio forwards calls on the iMessage number to the store's support number. AI calls show the iMessage number. | One number for chat and calls. A number that doesn't answer loses the lead. |
+| **Calls instead of replying** | A call back to the number that texted reaches the AI agent. | Blooio forwards the iMessage number's calls to the campaign number. AI calls show the iMessage number. | One number for chat and calls, as with SMS today. |
 | **Still typing** | The AI answers each message. | Wait a few seconds after the last message, with typing dots, then answer once. | People type in short bursts. Many answers look like a bot. |
 
 ## 3. Number health: how the team knows without a dashboard

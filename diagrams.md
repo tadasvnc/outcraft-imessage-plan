@@ -7,14 +7,15 @@ Back to the plan: [README.md](README.md)
 **Where this sits in Outcraft's flow:** lead joins a campaign → before each iMessage step, the **iMessage check** → the AI writes the step's message, by iMessage if the lead passed → scheduler: step is due → **B**, only for leads who passed: send-time checks, then iMessage from line X, or back to the AI → **C:** statuses and replies → AI answers and picks the next step. Leads who can't get iMessage get the campaign as usual.
 
 **How to read:**
-- 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 fallback: the AI picks the next step, as today, never from line X · 🟪 purple border: new for iMessage; grey border: already exists, shared with SMS
+- 🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 fallback: the AI picks the next step, as today, never from line X · 🟪 purple border: new for iMessage; grey border: already exists, shared with SMS · 🟨 dashed yellow: a note on a question
 - **Fallback** (🟦 blue boxes): when iMessage can't go, our app tells the AI that the step failed, and why, as a failed SMS does today. The AI picks the next step, as today, from the campaign's other channels: often SMS from the store's own number, sometimes a call. It never picks iMessage again for this lead in this campaign. Mid-chat, it says it's the same store, because the number changes. If the lead has no other text channel they agreed to, a person gets the chat instead.
 - **Who does it:** our app, the scheduler, the queue, the AI, the provider, or the lead's phone.
 - **Line X** is the store's iMessage line: one per store in v1, like its one SMS number. Every iMessage to the store's leads comes from it. It starts at most 10 new chats a day, then 25, then 50 as it warms up, and 15 an hour.
 - **Number health:** every failure, opt-out and provider warning updates line X's health. Weak: half the new chats, and a Slack alert. Blocked: no new chats, and Slack and the store are told (C1).
+- **"Still OK to send?"** (B and C2): the campaign's shared check, the same one SMS uses, run again right before sending. Yes only if the message hasn't gone out yet, and since the AI wrote it, the lead hasn't replied, bought or opted out. If not, the message is dropped and logged.
 - **iMessage switches:** one for everyone on Outcraft (our team, or the circuit breaker when the provider is down), one per store (our admins), one per campaign. All three must be on.
 - **Which steps:** iMessage is a fifth channel. In a campaign with iMessage on, a lead who passed the check gets text steps by iMessage instead of SMS. So a lead never gets SMS and iMessage from two numbers. After a fallback, the lead's next steps run as usual.
-- **What B leaves to the existing system:** sending hours, state legal hours and the frequency cap (the scheduler fires the step inside them); reply, purchase and opt-out (the campaign's shared check, the same one SMS uses, run again at send time). B adds only the iMessage on-switch and line X's limits.
+- **What B leaves to the existing system:** sending hours, state legal hours and the frequency cap (the scheduler fires the step inside them), and the "Still OK to send?" check. B adds only the iMessage on-switch and line X's limits.
 - **Legal hours in C:** live replies skip the scheduler, so C checks legal hours itself, with the same rule. It checks before the AI writes, so no answer waits for hours and goes out stale.
 - **Checks in two places:** the full iMessage check runs before writing. At send time, the campaign's shared check and the on-switch run again, so nothing stale goes out. If the check, or the lookup, fails, the lead gets the campaign as usual.
 - **When iMessage fails:** if we know it didn't arrive (refused, failed, not on iMessage), the AI picks the next step at once. If we don't know (no delivery status in 15 min), we don't resend, so the lead never gets both. The lead is marked, and the next steps run as usual. A late "delivered" clears the mark.
@@ -66,7 +67,10 @@ flowchart TD
     end
     style LEGEND fill:#ffffff,stroke:#d0d4db,color:#4b5563
     E0 ~~~ LG1
+    N0["<b>Still OK to send?</b><br/>Yes if it's not sent yet, and the lead<br/>hasn't replied, bought or opted out<br/>since it was written. Same check as SMS."]:::note
+    N0 -.- Q0
 
+    classDef note fill:#fffbeb,stroke:#d97706,stroke-width:1px,stroke-dasharray:4 3,color:#1f2328
     classDef start fill:#4f46e5,stroke:#4f46e5,color:#ffffff
     classDef finish fill:#1f2328,stroke:#1f2328,color:#ffffff
     classDef action fill:#ffffff,stroke:#d0d4db,color:#1f2328
@@ -82,7 +86,7 @@ flowchart TD
     linkStyle 2,5,8,12,14,21,22,27 color:#b91c1c,stroke:#6b7280
 ```
 
-🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 fallback: the AI picks the next step, as today, never from line X · 🟪 purple border: new for iMessage; grey border: already exists, shared with SMS
+🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 fallback: the AI picks the next step, as today, never from line X · 🟪 purple border: new for iMessage; grey border: already exists, shared with SMS · 🟨 dashed yellow: a note on a question
 
 If the diagram doesn't render: [diagram-b.png](diagram-b.png)
 
@@ -107,7 +111,7 @@ flowchart TD
         Q8 -- yes --> R2("<b>Our app</b><br/>opts the lead out on all<br/>of this store's channels,<br/>cancels steps") --> OUT2("<b>Provider</b><br/>one confirmation leaves line X"):::out
         OUT2 --> E8(("<b>End</b>"))
         Q8 -- no --> R3("<b>Our app</b><br/>cancels scheduled steps,<br/>marks the lead as replied,<br/>no-link rule lifts")
-        R3 --> Q9{"A person on it,<br/>or 30 AI replies?"}
+        R3 --> Q9{"Opted out, person on it,<br/>or 30 AI replies?"}
         Q9 -- yes --> R4("<b>Our app</b><br/>notifies the person, stops<br/>the typing dots, AI stays quiet") --> E9(("<b>End</b>"))
         Q9 -- no --> QL{"Inside state<br/>legal hours?"}
         QL -- no --> R9("<b>Queue</b><br/>waits until the hours open.<br/>The AI writes then,<br/>with the whole chat"):::new --> R5
@@ -125,6 +129,7 @@ flowchart TD
         Q13 -- no --> R6
         Q13 -- yes --> OUT("<b>Provider</b><br/>the answer leaves line X,<br/>the number the lead wrote to"):::out
         OUT --> PH("<b>Lead's phone</b><br/>answer arrives in<br/>the same thread") --> E11(("<b>End</b>"))
+        N1["<b>Still OK to send?</b><br/>Yes if it's not sent yet, and the lead<br/>hasn't replied, bought or opted out<br/>since it was written. Same check as SMS."]:::note
     end
 
     subgraph C1 ["C1. Delivery statuses"]
@@ -132,7 +137,7 @@ flowchart TD
         Q4a{"Line X<br/>blocked?"}:::new
         Q4a -- yes --> D4
         Q4a -- no --> Q4{"Sent, delivered<br/>or read?"}
-        Q4 -- yes --> D1("<b>Queue</b><br/>saves the status, updates<br/>line stats. A late 'delivered'<br/>clears 'not on iMessage'") --> E3(("<b>End</b>"))
+        Q4 -- yes --> D1("<b>Queue</b><br/>saves the status and<br/>updates line health.<br/>A late 'delivered' removes<br/>the 'not on iMessage' mark") --> E3(("<b>End</b>"))
         Q4 -- no --> Q5{"Not on<br/>iMessage?"}:::new
         Q5 -- no --> D3("<b>Queue</b><br/>the message failed: marks it,<br/>counts it for line health, logs"):::new --> FB
         Q5 -- yes --> DM("<b>Queue</b><br/>marks the lead<br/>not on iMessage"):::new --> FB
@@ -153,7 +158,11 @@ flowchart TD
     end
     style LEGEND fill:#ffffff,stroke:#d0d4db,color:#4b5563
     E6 ~~~ LG1
+    N1 -.- QS
+    N2["<b>No status after 15 min?</b><br/>Yes: no 'delivered' or 'failed' came<br/>back for a message we sent.<br/>No: a status or reply we missed,<br/>handled like a webhook."]:::note
+    N2 -.- QR
 
+    classDef note fill:#fffbeb,stroke:#d97706,stroke-width:1px,stroke-dasharray:4 3,color:#1f2328
     classDef start fill:#4f46e5,stroke:#4f46e5,color:#ffffff
     classDef finish fill:#1f2328,stroke:#1f2328,color:#ffffff
     classDef action fill:#ffffff,stroke:#d0d4db,color:#1f2328
@@ -169,6 +178,6 @@ flowchart TD
     linkStyle 1,4,10,14,15,20,23,24,27,31,37,40,41,48 color:#b91c1c,stroke:#6b7280
 ```
 
-🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 fallback: the AI picks the next step, as today, never from line X · 🟪 purple border: new for iMessage; grey border: already exists, shared with SMS
+🟣 start (what triggers it) · ⚫ end, one per branch · ◇ a question, with yes and no arrows · ▢ an action, **bold** = who does it · 🟩 an iMessage leaves line X · 🟦 fallback: the AI picks the next step, as today, never from line X · 🟪 purple border: new for iMessage; grey border: already exists, shared with SMS · 🟨 dashed yellow: a note on a question
 
 If the diagram doesn't render: [diagram-c.png](diagram-c.png)
