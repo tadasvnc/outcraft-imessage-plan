@@ -32,8 +32,6 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
 | Edge case | Today | Suggestion | Why |
 |---|---|---|---|
 | **Channel check** | The lead's profile shows which channels work, like phone or email. | Before the AI writes, also check for iMessage, inside today's check if there is one. | Only a lookup can tell. |
-| **Message writing** | The AI writes, then the scheduler sends. | If the lead has iMessage, the AI also writes an iMessage version. | We only know at send time whether iMessage works, so both versions are ready. |
-| **Follow-ups and calls** | Steps and calls run on schedule. | A reply or a purchase cancels them. No calls during a chat. | No "still thinking?" after "yes, I'm buying". |
 
 ## 3. Number health: how the team knows without a dashboard
 
