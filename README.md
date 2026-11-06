@@ -2,7 +2,7 @@
 
 Tadas Vinckas · [Diagrams](diagrams.md)
 
-In short: iMessage could get more iPhone shoppers to reply and buy, but it costs about 20 times more than SMS, and Apple can block a number that looks like spam. So we test before we build. First we check that enough shoppers use iMessage. Then a small test in three stores counts who buys. If too few shoppers reply, it may not pay off. After seven weeks we decide whether it wins enough extra carts to pay for itself.
+In short: iMessage could get more iPhone shoppers to reply and buy. But it costs much more than SMS, and Apple can block a number that looks like spam. So we test before we build. First we check that enough shoppers use iMessage. Then a small test in three stores shows whether they reply and buy. Without enough replies, it won't pay off. After seven weeks we decide whether it can win enough extra carts over SMS to pay for its higher cost. If it can, we build the full version.
 
 ## 1. Provider: which one, and why
 
@@ -22,7 +22,7 @@ In short: iMessage could get more iPhone shoppers to reply and buy, but it costs
 |---|---|---|
 | **Apple blocks a number** | Spam reports or sudden bursts get it blocked, and its chats stop. | New numbers start slowly. Only shoppers who agreed to texts, never at night. |
 | **Two numbers** | Texts and iMessages share one app. A second store number looks like a scam. | Each shopper hears from one number. If a chat moves to SMS, it says it's the same store. |
-| **First message** | To stop scams, an iPhone won't let shoppers tap a link from a number they haven't saved or replied to. A number that sends a lot but gets few replies looks like a bot. | A short question first, the link after the reply. If replies stay low: fewer chats, or Linq. |
+| **First message** | An iPhone blocks links from unknown numbers until the shopper replies. Many messages with few replies look like a bot. | A short question first, the link after the reply. If replies stay low: fewer chats, or Linq. |
 | **Same first message** | Blooio restricts every number when half our first messages start the same way. | Each first message is personal: store, product, varied wording. |
 | **One bad store** | It could get our whole account closed. | We check what a store sells before turning it on. A number that goes wrong switches off on its own. |
 | **STOP and state law** | No phone carrier handles "STOP" for us. Some states limit sending hours. | We catch STOP ourselves and follow the same rules as SMS. |
