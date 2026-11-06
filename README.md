@@ -38,13 +38,13 @@ In short: iMessage could get more iPhone shoppers to reply and buy. But it costs
 
 ## 3. Line health: how the team knows without a dashboard
 
-- **Suggestion:** Slack alerts the team when a line gets weak or blocked. Blooio warns us, each message counts, and the catch-up job flags a silent line. A blocked line is replaced in a day.
+- **Suggestion:** Slack alerts the team when a line gets weak or blocked. Three signals: Blooio's own warnings, even when we send nothing; failures and opt-outs on each message; and the catch-up job, if a line goes silent. A blocked line is replaced in a day.
 
 ## 4. Who turns it on: our admins, every store, or a plan
 
 - **Today:** each campaign turns its own channels on: calls, SMS, email, WhatsApp.
 - **Suggestion:** our admins turn it on, one store at a time. Not by stores yet: each new line needs a slow start and a content check, and one bad store could get everyone blocked.
-- **In the pilot: no fee, only a share of the sales it wins.** We pay for the lines, so stores join fast and pay only when it works. Once the pilot shows the extra carts, we set the final price: a share or a paid add-on.
+- **In the pilot: no fee, only a share of the sales it wins.** We pay for the lines, so stores join fast and pay only when it works. After the pilot, we set the final price: a share or a paid add-on.
 
 ## 5. Which leads get it, and what happens to the rest
 
