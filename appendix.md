@@ -257,7 +257,7 @@ Two-sided test, 5% significance, 80% power. The baselines without iMessage (6% r
 - **Contact card in the order confirmation email or on the thank-you page:** once it's saved, there is no junk banner.
 - **RCS for Business** for Android, next to iMessage.
 - **Apple Messages for Business** for inbound questions.
-- **Pricing:** a best-effort premium channel with automatic fallback, priced per line.
+- **Pricing:** a best-effort premium channel with automatic fallback, priced per line or as a share of the sales it wins.
 
 ## K. Questions for the team
 

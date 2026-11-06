@@ -32,16 +32,17 @@ In short: iMessage could get more iPhone shoppers to reply and buy. But it costs
 |---|---|---|---|
 | **Channel check** | The lead's profile shows which channels work, like phone or email. | Before the AI writes, also check for iMessage, inside today's check if there is one. | Only a lookup can tell. |
 | **Calls instead of replying** | A call back to the number that texted reaches the AI agent. | Blooio forwards the line's calls to the campaign number. AI calls show the line's number. | One number for chat and calls, as with SMS today. |
-| **Still typing** | Unclear whether the AI waits for more messages. | Wait a few seconds after the last message, with typing dots, then answer once. | People type in short bursts. Many answers look like a bot. |
+| **Typing dots** | SMS has no typing dots. | Show the shopper our typing dots while the AI writes. Answer once, a few seconds after their last message. | Shoppers text in bursts, so we wait. The dots show a reply is coming. |
 
 ## 3. Line health: how the team knows without a dashboard
 
-- **Suggestion:** Slack tells the team when a line goes wrong. We check it with every message, so no extra job is needed. A blocked line stops at once and is replaced within a day.
+- **Suggestion:** Slack tells the team when a line goes wrong. We check it with every message, so no extra job is needed. A blocked line stops at once and is replaced in a day.
 
 ## 4. Who turns it on: our admins, every store, or a plan
 
 - **Today:** each campaign turns its own channels on: calls, SMS, email, WhatsApp.
-- **Suggestion:** our admins turn it on, one store at a time. Not by stores yet: each new line needs a slow start and a content check, and one bad store could get everyone blocked. Not in a price plan yet: the pilot first shows what it's worth. Later, a paid add-on.
+- **Suggestion:** our admins turn it on, one store at a time. Not by stores yet: each new line needs a slow start and a content check, and one bad store could get everyone blocked.
+- **In the pilot: no fee, only a share of the sales it wins.** We pay for the lines, so stores join fast and pay only when it works. Once the pilot shows the extra carts, we set the final price: a share or a paid add-on.
 
 ## 5. Which leads get it, and what happens to the rest
 
