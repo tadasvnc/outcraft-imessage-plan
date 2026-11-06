@@ -32,7 +32,7 @@ In short: iMessage could get more iPhone shoppers to reply and buy. But it costs
 |---|---|---|---|
 | **Channel check** | The lead's profile shows which channels work, like phone or email. | Before the AI writes, also check for iMessage, inside today's check if there is one. | Only a lookup can tell. |
 | **Calls instead of replying** | A call back to the number that texted reaches the AI agent. | Blooio forwards the line's calls to the campaign number. AI calls show the line's number. | One number for chat and calls, as with SMS today. |
-| **Still typing** | The AI answers each message. | Wait a few seconds after the last message, with typing dots, then answer once. | People type in short bursts. Many answers look like a bot. |
+| **Still typing** | Unclear whether the AI waits for more messages. | Wait a few seconds after the last message, with typing dots, then answer once. | People type in short bursts. Many answers look like a bot. |
 
 ## 3. Line health: how the team knows without a dashboard
 
@@ -55,4 +55,4 @@ In short: iMessage could get more iPhone shoppers to reply and buy. But it costs
   1. **Week 1:** check that enough shoppers use iMessage. Sign Blooio, give stores the required notice, and build a small test.
   2. **Week 2:** the test starts in three stores: a short, personal question, then the cart link after a reply. We count who buys.
   3. **Week 3:** stop if a line gets blocked or shoppers ask us to stop more than on SMS.
-  4. **Week 7:** decide. Go if iMessage wins about 2 more carts per 100 shoppers, enough to pay for the lines. Then build the full version in a week or two.
+  4. **Week 7:** decide. Go if iMessage wins enough extra carts over SMS to pay for its higher cost. Then build the full version in a week or two.
