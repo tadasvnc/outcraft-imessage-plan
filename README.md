@@ -12,7 +12,7 @@ In short: iMessage could get more iPhone shoppers to reply and buy. But it costs
   - **Safe:** it blocks messages that break its rules, like a link before a reply. A bug on our side costs one message, not a blocked line.
   - **Fast to start:** $289 a month per line (one number), no setup fee, live in days.
   - **Early warning:** it tells us when a line is at risk, so we can slow down.
-- **Not Linq for now:** it only warns and leaves stopping to us. It's our backup.
+- **Not Linq for now:** it only warns and leaves stopping to us. It's our plan B if Blooio doesn't work out.
 - **Not Sendblue:** it sells cart recovery to stores, so it competes with us. Also a 2026 breach.
 - **Not our own Macs:** nothing would catch our mistakes, and every ban would be ours to fix.
 
