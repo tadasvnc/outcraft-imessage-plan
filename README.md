@@ -32,7 +32,7 @@ In short: iMessage could get more iPhone shoppers to reply and buy. But it costs
 |---|---|---|---|
 | **Channel check** | The lead's profile shows which channels work. | Also check for iMessage before the AI writes, inside today's check. | Only a lookup can tell. |
 | **Calls instead of replying** | A call back to the number that texted reaches the AI agent. | Blooio forwards the line's calls to the campaign number. AI calls show the line's number. | One number for chat and calls, as with SMS today. |
-| **Short texts in a row** | Unclear whether the AI waits for more messages. | Wait a bit longer than on SMS, then answer once. | It feels like chat, so shoppers send more short texts. |
+| **Short texts in a row** | The AI probably waits a few seconds for more texts. | Wait a bit longer than on SMS, about 15 seconds, then answer once. If we see them typing, keep waiting. | It feels like chat, so shoppers send more short texts. Our dots make the wait feel fine. |
 | **Typing dots** | SMS has no typing dots. | Show the shopper our typing dots while we wait and write. | They see a reply is coming and stay in the chat. |
 
 ## 3. Line health: how the team knows without a dashboard
