@@ -10,10 +10,10 @@ In short: iMessage could get more iPhone shoppers to reply and buy. But it costs
 - **Suggestion: Blooio**, for the test and the pilot.
 - **Why:**
   - **Safe:** it blocks messages that break its rules, like a link before a reply. A bug on our side costs one message, not a blocked line.
-  - **Fast to start:** $289 a month per line (one iMessage number), no setup fee, live in days.
+  - **Fast to start:** $289 a month per line (one number), no setup fee, live in days.
   - **Early warning:** it tells us when a line is at risk, so we can slow down.
 - **Not Linq for now:** it only warns and leaves stopping to us. It's our backup.
-- **Not Sendblue:** it sells cart recovery to stores, so it competes with us. And a 2026 data breach.
+- **Not Sendblue:** it sells cart recovery to stores, so it competes with us. Also a 2026 breach.
 
 ## 2. Risks: what can go wrong, and what we do
 
@@ -30,9 +30,10 @@ In short: iMessage could get more iPhone shoppers to reply and buy. But it costs
 
 | Edge case | Today | Suggestion | Why |
 |---|---|---|---|
-| **Channel check** | The lead's profile shows which channels work, like phone or email. | Before the AI writes, also check for iMessage, inside today's check if there is one. | Only a lookup can tell. |
+| **Channel check** | The lead's profile shows which channels work. | Also check for iMessage before the AI writes, inside today's check. | Only a lookup can tell. |
 | **Calls instead of replying** | A call back to the number that texted reaches the AI agent. | Blooio forwards the line's calls to the campaign number. AI calls show the line's number. | One number for chat and calls, as with SMS today. |
-| **Typing dots** | SMS has no typing dots. | Show the shopper our typing dots while the AI writes. Answer once, a few seconds after their last message. | Shoppers text in bursts, so we wait. The dots show a reply is coming. |
+| **Short texts in a row** | Unclear whether the AI waits for more messages. | Wait a bit longer than on SMS, then answer once. | It feels like chat, so shoppers send more short texts. |
+| **Typing dots** | SMS has no typing dots. | Show the shopper our typing dots while we wait and write. | They see a reply is coming and stay in the chat. |
 
 ## 3. Line health: how the team knows without a dashboard
 
