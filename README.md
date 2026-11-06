@@ -38,7 +38,7 @@ In short: iMessage could get more iPhone shoppers to reply and buy. But it costs
 
 ## 3. Line health: how the team knows without a dashboard
 
-- **Suggestion:** Slack tells the team when a line goes wrong. We check it with every message, so no extra job is needed. A blocked line stops at once and is replaced in a day.
+- **Suggestion:** Slack alerts the team when a line gets weak or blocked. Blooio warns us, each message counts, and the catch-up job flags a silent line. A blocked line is replaced in a day.
 
 ## 4. Who turns it on: our admins, every store, or a plan
 
