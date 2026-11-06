@@ -14,6 +14,7 @@ In short: iMessage could get more iPhone shoppers to reply and buy. But it costs
   - **Early warning:** it tells us when a line is at risk, so we can slow down.
 - **Not Linq for now:** it only warns and leaves stopping to us. It's our backup.
 - **Not Sendblue:** it sells cart recovery to stores, so it competes with us. Also a 2026 breach.
+- **Not our own Macs:** nothing would catch our mistakes, and every ban would be ours to fix.
 
 ## 2. Risks: what can go wrong, and what we do
 
@@ -47,8 +48,8 @@ In short: iMessage could get more iPhone shoppers to reply and buy. But it costs
 
 ## 5. Which leads get it, and what happens to the rest
 
-- **Suggestion:** only leads who agreed to texts and whose phone has iMessage. We check only where iMessage is on.
-- **One number per lead:** with iMessage on, the campaign's texts go by iMessage. If one fails, the AI picks the next step, as after a failed SMS today.
+- **Suggestion:** before the AI writes, we check: iMessage is on for the store and campaign, the lead agreed to texts and has iMessage, and the line is healthy and under its daily chat limit.
+- **Right before sending, we check the line again.** If it went down, no retry: the AI picks the next step, as after a failed SMS.
 - **The rest** get the campaign as today, without iMessage. We log why.
 
 ## 6. First version and time
